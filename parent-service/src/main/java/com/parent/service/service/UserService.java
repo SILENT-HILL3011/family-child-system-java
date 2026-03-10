@@ -1,6 +1,5 @@
 package com.parent.service.service;
 
-import com.child.common.entity.dto.UserLoginDTO;
 import com.child.common.entity.po.User;
 import com.child.common.vo.UserLoginVO;
 
@@ -9,5 +8,5 @@ public interface UserService {
 
      User updateUserInfo(User user);
 
-     UserLoginVO login(UserLoginDTO userLoginDTO);
+     UserLoginVO login(String phoneNumber, String password);
 }

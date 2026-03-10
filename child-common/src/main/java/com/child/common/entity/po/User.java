@@ -5,6 +5,33 @@ public class User {
     private String phoneNumber;
     private String password;
     private String userName;
+    private Integer age;
+    private Integer sex;
+    private Boolean haveFamily;
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public Integer getSex() {
+        return sex;
+    }
+
+    public void setSex(Integer sex) {
+        this.sex = sex;
+    }
+
+    public Boolean getHaveFamily() {
+        return haveFamily;
+    }
+
+    public void setHaveFamily(Boolean haveFamily) {
+        this.haveFamily = haveFamily;
+    }
 
     public String getId() {
         return id;
@@ -38,13 +65,4 @@ public class User {
         this.userName = userName;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id='" + id + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", password='" + password + '\'' +
-                ", userName='" + userName + '\'' +
-                '}';
-    }
 }

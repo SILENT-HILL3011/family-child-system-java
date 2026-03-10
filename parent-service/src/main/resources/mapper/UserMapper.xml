@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.parent.service.mapper.UserMapper">
+    <!-- 结果集映射（可选，若实体类字段与数据库字段一致可省略） -->
+    <resultMap id="UserResultMap" type="com.child.common.entity.po.User">
+        <id column="user_id" property="id"/>
+        <result column="phone_number" property="phoneNumber"/>
+        <result column="password" property="password"/>
+        <result column="user_name" property="userName"/>
+        <result column="age" property="age"/>
+        <result column="sex" property="sex"/>
+        <result column="have_family" property="haveFamily"/>
+    </resultMap>
+
+    <!-- 根据ID查询用户 -->
+    <select id="selectById" parameterType="java.lang.String" resultMap="UserResultMap">
+        SELECT user_id, phone_number, password, user_name, age, sex, have_family
+        FROM user_info
+        WHERE user_id = #{id}
+    </select>
+
+    <!-- 动态更新用户信息（核心） -->
+    <update id="updateUserInfo" parameterType="com.child.common.entity.po.User">
+        UPDATE user_info
+        <set>
+            <!-- 1. 用户名：允许更新为空字符串（判断是否为null，而非空） -->
+            <if test="userName != null">
+                user_name = #{userName},
+            </if>
+            <!-- 2. 年龄：允许更新为null -->
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <!-- 3. 性别：允许更新为null -->
+            <if test="sex != null">
+                sex = #{sex},
+            </if>
+            <!-- 4. 是否有家庭：允许更新为null/false -->
+            <if test="haveFamily != null">
+                have_family = #{haveFamily},
+            </if>
+        </set>
+        WHERE user_id = #{id}
+    </update>
+</mapper>
