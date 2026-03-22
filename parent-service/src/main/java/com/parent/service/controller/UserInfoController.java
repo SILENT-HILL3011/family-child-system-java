@@ -40,7 +40,8 @@ public class UserInfoController {
     }
 
     @RequestMapping("/createFamily")
-    public R createFamily(@NotEmpty String userId, List<String> childNames){
+    public R createFamily(@NotEmpty String userId,@NotEmpty String familyName){
+        userService.createFamily(userId,familyName);
         return R.success();
     }
 
@@ -48,5 +49,11 @@ public class UserInfoController {
     @GlobalInterceptor(checkLogin = true)
     public R<User> updateUserInfo(@RequestBody User user){
         return R.success(userService.updateUserInfo(user));
+    }
+
+    @RequestMapping("/addMember")
+    public R addMember(@NotEmpty String familyId,@NotEmpty String memberName){
+        userService.addMember(familyId,memberName);
+        return R.success();
     }
 }

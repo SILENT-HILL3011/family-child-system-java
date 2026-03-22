@@ -1,6 +1,8 @@
 package com.parent.service.service.impl;
 
 import com.child.common.constants.Constant;
+import com.child.common.entity.po.Family;
+import com.child.common.entity.po.Member;
 import com.child.common.entity.po.User;
 import com.child.common.entity.vo.ResponseCodeEnum;
 import com.child.common.exception.BusinessException;
@@ -12,6 +14,7 @@ import com.parent.service.service.UserService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -49,6 +52,32 @@ public class UserServiceImpl implements UserService {
         userLoginVO.setPhoneNumber(phoneNumber);
         userLoginVO.setPassword(password);
         return userLoginVO;
+    }
+
+    @Override
+    public void createFamily(String userId,String familyName) {
+        Family checkIsExist = userMapper.selectFamilyById(userId);
+        if (checkIsExist != null){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        Family family = new Family();
+        family.setFamilyId(StringTools.getRandomNumber(Constant.LENGTH_12));
+        family.setCreateUserId(userId);
+        family.setFamilyName(familyName);
+        userMapper.insertFamily(family);
+    }
+
+    @Override
+    public void addMember(String familyId, String memberName) {
+        Family checkIsExist = userMapper.selectFamilyById(familyId);
+        if (checkIsExist == null){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        Member member = new Member();
+        member.setMemberId(StringTools.getRandomNumber(Constant.LENGTH_12));
+        member.setMemberName(memberName);
+        member.setFamilyId(familyId);
+        userMapper.insertMember(member);
     }
 
     @Override
