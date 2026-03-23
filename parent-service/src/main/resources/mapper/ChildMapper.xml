@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.parent.service.mapper.ChildMapper">
+    <resultMap id="ChildResultMap" type="com.child.common.entity.po.Child">
+        <id column="user_id" property="childId"/>
+        <result column="child_name" property="childName"/>
+        <result column="sex" property="sex"/>
+        <result column="family_id" property="familyId"/>
+        <result column="idnumber" property="idNumber"/>
+        <result column="status" property="status"/>
+        <result column="health_condition" property="healthCondition"/>
+        <result column="dietary_status" property="dietaryStatus"/>
+        <result column="chinesewordcount" property="chineseWordCount"/>
+        <result column="englishwordcount" property="englishWordCount"/>
+        <result column="poetrycount" property="poetryCount"/>
+    </resultMap>
+
+    <update id="update" parameterType="com.child.common.entity.po.Child">
+        UPDATE child_info
+        <set>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="healthCondition != null">
+                health_condition = #{healthCondition},
+            </if>
+            <if test="dietaryStatus != null">
+                dietary_status = #{dietaryStatus},
+            </if>
+            <if test="chineseWordCount != null">
+                chinesewordcount = #{chineseWordCount},
+            </if>
+            <if test="englishWordCount != null">
+                englishwordcount = #{englishWordCount},
+            </if>
+            <if test="poetryCount != null">
+                poetrycount = #{poetryCount},
+            </if>
+        </set>
+    </update>
+
+
+</mapper>

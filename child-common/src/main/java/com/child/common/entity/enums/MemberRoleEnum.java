@@ -1,13 +1,13 @@
 package com.child.common.entity.enums;
 
-public enum MemberRole {
+public enum MemberRoleEnum {
     MAIN(1, "主力"),
     WITH(0, "协同")
     ;
 
     private Integer code;
     private String desc;
-    MemberRole(Integer code, String desc) {
+    MemberRoleEnum(Integer code, String desc) {
         this.code = code;
         this.desc = desc;
     }

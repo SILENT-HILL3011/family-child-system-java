@@ -1,11 +1,36 @@
-package com.child.common.entity.po;
+package com.child.common.entity.vo;
 
-public class StudyCondition {
-
+public class GrowthConditionVO {
+    private String healthCondition;
+    private String dietaryStatus;
+    private Integer status;
     private Integer chineseWordCount;
     private Integer englishWordCount;
     private Integer poetryCount;
-    private String status;
+
+    public String getHealthCondition() {
+        return healthCondition;
+    }
+
+    public void setHealthCondition(String healthCondition) {
+        this.healthCondition = healthCondition;
+    }
+
+    public String getDietaryStatus() {
+        return dietaryStatus;
+    }
+
+    public void setDietaryStatus(String dietaryStatus) {
+        this.dietaryStatus = dietaryStatus;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
 
     public Integer getChineseWordCount() {
         return chineseWordCount;
@@ -29,13 +54,5 @@ public class StudyCondition {
 
     public void setPoetryCount(Integer poetryCount) {
         this.poetryCount = poetryCount;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 }

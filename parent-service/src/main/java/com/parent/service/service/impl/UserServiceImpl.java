@@ -2,7 +2,7 @@ package com.parent.service.service.impl;
 
 import com.child.common.constants.Constant;
 import com.child.common.entity.enums.HaveFamilyEnum;
-import com.child.common.entity.enums.MemberRole;
+import com.child.common.entity.enums.MemberRoleEnum;
 import com.child.common.entity.po.Family;
 import com.child.common.entity.po.Member;
 import com.child.common.entity.po.User;
@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
         userMapper.insertFamily(family);
         userMapper.updateUserFamily(userId);
         User user = userMapper.selectById(userId);
-        addMember(userId,family.getFamilyId(),user.getUserName(),seniority, MemberRole.MAIN.getCode(),user.getPhoneNumber());
+        addMember(userId,family.getFamilyId(),user.getUserName(),seniority, MemberRoleEnum.MAIN.getCode(),user.getPhoneNumber());
     }
 
     @Override

@@ -10,4 +10,10 @@ public interface ChildMapper {
 
     @Insert("insert into child_info(child_id, child_name, family_id, sex,idnumber) values(#{childId},#{childName},#{familyId},#{sex},#{idNumber})")
     void insert(Child child);
+
+    @Select("select * from child_info where child_id = #{childId}")
+    Child selectById(String childId);
+
+
+    void update(Child child);
 }

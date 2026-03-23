@@ -7,6 +7,36 @@ public class Child {
     private Integer sex;
     private String familyId;
     private String idNumber;
+    private Integer status;
+    private Integer chineseWordCount;
+    private Integer englishWordCount;
+    private Integer poetryCount;
+    private String healthCondition;
+    private String dietaryStatus;
+
+    public String getChildId() {
+        return childId;
+    }
+
+    public void setChildId(String childId) {
+        this.childId = childId;
+    }
+
+    public String getChildName() {
+        return childName;
+    }
+
+    public void setChildName(String childName) {
+        this.childName = childName;
+    }
+
+    public Integer getSex() {
+        return sex;
+    }
+
+    public void setSex(Integer sex) {
+        this.sex = sex;
+    }
 
     public String getIdNumber() {
         return idNumber;
@@ -24,24 +54,36 @@ public class Child {
         this.familyId = familyId;
     }
 
-    public Integer getSex() {
-        return sex;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setSex(Integer sex) {
-        this.sex = sex;
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
-    private String healthCondition;
-    private String dietaryStatus;
-    private StudyCondition studyCondition;
-
-    public String getChildId() {
-        return childId;
+    public Integer getChineseWordCount() {
+        return chineseWordCount;
     }
 
-    public void setChildId(String childId) {
-        this.childId = childId;
+    public void setChineseWordCount(Integer chineseWordCount) {
+        this.chineseWordCount = chineseWordCount;
+    }
+
+    public Integer getPoetryCount() {
+        return poetryCount;
+    }
+
+    public void setPoetryCount(Integer poetryCount) {
+        this.poetryCount = poetryCount;
+    }
+
+    public Integer getEnglishWordCount() {
+        return englishWordCount;
+    }
+
+    public void setEnglishWordCount(Integer englishWordCount) {
+        this.englishWordCount = englishWordCount;
     }
 
     public String getHealthCondition() {
@@ -52,27 +94,11 @@ public class Child {
         this.healthCondition = healthCondition;
     }
 
-    public String getChildName() {
-        return childName;
-    }
-
-    public void setChildName(String childName) {
-        this.childName = childName;
-    }
-
     public String getDietaryStatus() {
         return dietaryStatus;
     }
 
     public void setDietaryStatus(String dietaryStatus) {
         this.dietaryStatus = dietaryStatus;
-    }
-
-    public StudyCondition getStudyCondition() {
-        return studyCondition;
-    }
-
-    public void setStudyCondition(StudyCondition studyCondition) {
-        this.studyCondition = studyCondition;
     }
 }
