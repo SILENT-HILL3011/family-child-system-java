@@ -12,4 +12,6 @@ public class Constant {
     private static final String REDIS_KEY_PREFIX = "child-system:";
     public static final String REDIS_KEY_CHECK_CODE = REDIS_KEY_PREFIX + "checkcode:";
     public static final String TOKEN_HEADER_KEY = "token";
+
+
 }

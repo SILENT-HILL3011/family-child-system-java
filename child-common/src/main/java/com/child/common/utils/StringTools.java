@@ -18,4 +18,6 @@ public class StringTools {
     public static void main(String[] args) {
         System.out.println(getRandomNumber(10));
     }
+
+
 }

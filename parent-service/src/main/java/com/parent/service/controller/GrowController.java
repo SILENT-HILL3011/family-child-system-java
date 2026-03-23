@@ -2,6 +2,7 @@ package com.parent.service.controller;
 
 import com.child.common.annotation.GlobalInterceptor;
 import com.child.common.entity.po.Child;
+import com.child.common.entity.po.VaccineRecord;
 import com.child.common.entity.vo.GrowthConditionVO;
 import com.child.common.result.R;
 import com.parent.service.service.ChildService;
@@ -38,6 +39,18 @@ public class GrowController {
     @GlobalInterceptor(checkLogin = true)
     public R<GrowthConditionVO> getGrowthInfo(@NotEmpty String childId){
         return R.success(childService.getGrowthInfo(childId));
+    }
+
+    @RequestMapping("/searchVaccine")
+    public R<VaccineRecord> searchVaccine(@NotEmpty String childId){
+        VaccineRecord vaccineRecord = childService.searchVaccine(childId);
+        return R.success(vaccineRecord);
+    }
+
+    @RequestMapping("/updateVaccine")
+    public R updateVaccine(@NotEmpty String childId,@NotEmpty String vaccine){
+        childService.updateVaccine(childId,vaccine);
+        return R.success();
     }
 
 

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace必须与Mapper接口全类名一致 -->
+<mapper namespace="com.parent.service.mapper.VaccineRecordMapper">
+
+    <!-- 通用结果集映射：匹配POJO字段和数据库列名 -->
+    <resultMap id="VaccineRecordResultMap" type="com.child.common.entity.po.VaccineRecord">
+        <id column="child_id" property="childId" />
+        <result column="hbv_times" property="HBVTimes" />
+        <result column="hbv_last_time" property="HBVLastTime" />
+        <result column="hav_times" property="HAVTimes" />
+        <result column="hav_last_time" property="HAVLastTime" />
+        <result column="bcgv_times" property="BCGVTimes" />
+        <result column="bcg_last_time" property="BCGLastTime" />
+        <result column="opv_times" property="OPVTimes" />
+        <result column="opv_last_time" property="OPVLastTime" />
+        <result column="dtap_times" property="DTaPTimes" />
+        <result column="dtap_last_time" property="DTaPLastTime" />
+        <result column="dt_times" property="DTTimes" />
+        <result column="dt_last_time" property="DTLastTime" />
+        <result column="mmr_times" property="MMRTimes" />
+        <result column="mmr_last_time" property="MMRLastTime" />
+        <result column="jevl_times" property="JEVLTimes" />
+        <result column="jevl_last_time" property="JEVLLastTime" />
+        <result column="gacpv_times" property="GACPVTimes" />
+        <result column="gacpv_last_time" property="GACPVLastTime" />
+    </resultMap>
+
+    <!-- 根据childId查询 -->
+    <select id="selectByChildId" resultMap="VaccineRecordResultMap">
+        SELECT
+        child_id,
+        hbv_times,
+        hbv_last_time,
+        hav_times,
+        hav_last_time,
+        bcgv_times,
+        bcg_last_time,
+        opv_times,
+        opv_last_time,
+        dtap_times,
+        dtap_last_time,
+        dt_times,
+        dt_last_time,
+        mmr_times,
+        mmr_last_time,
+        jevl_times,
+        jevl_last_time,
+        gacpv_times,
+        gacpv_last_time
+        FROM vaccine_record  <!-- 替换为你的实际表名 -->
+        WHERE child_id = #{childId}
+    </select>
+
+    <!-- 新增记录 -->
+    <insert id="insert" parameterType="com.child.common.entity.po.VaccineRecord">
+        INSERT INTO vaccine_record (
+            child_id,
+            hbv_times,
+            hbv_last_time,
+            hav_times,
+            hav_last_time,
+            bcgv_times,
+            bcg_last_time,
+            opv_times,
+            opv_last_time,
+            dtap_times,
+            dtap_last_time,
+            dt_times,
+            dt_last_time,
+            mmr_times,
+            mmr_last_time,
+            jevl_times,
+            jevl_last_time,
+            gacpv_times,
+            gacpv_last_time
+        ) VALUES (
+                     #{childId},
+                     #{HBVTimes},
+                     #{HBVLastTime},
+                     #{HAVTimes},
+                     #{HAVLastTime},
+                     #{BCGVTimes},
+                     #{BCGLastTime},
+                     #{OPVTimes},
+                     #{OPVLastTime},
+                     #{DTaPTimes},
+                     #{DTaPLastTime},
+                     #{DTTimes},
+                     #{DTLastTime},
+                     #{MMRTimes},
+                     #{MMRLastTime},
+                     #{JEVLTimes},
+                     #{JEVLLastTime},
+                     #{GACPVTimes},
+                     #{GACPVLastTime}
+                 )
+    </insert>
+
+    <!-- 根据childId更新（非空字段） -->
+    <update id="updateByChildId" parameterType="com.child.common.entity.po.VaccineRecord">
+        UPDATE vaccine_record
+        <set>
+            <if test="HBVTimes != null">hbv_times = #{HBVTimes},</if>
+            <if test="HBVLastTime != null">hbv_last_time = #{HBVLastTime},</if>
+            <if test="HAVTimes != null">hav_times = #{HAVTimes},</if>
+            <if test="HAVLastTime != null">hav_last_time = #{HAVLastTime},</if>
+            <if test="BCGVTimes != null">bcgv_times = #{BCGVTimes},</if>
+            <if test="BCGLastTime != null">bcg_last_time = #{BCGLastTime},</if>
+            <if test="OPVTimes != null">opv_times = #{OPVTimes},</if>
+            <if test="OPVLastTime != null">opv_last_time = #{OPVLastTime},</if>
+            <if test="DTaPTimes != null">dtap_times = #{DTaPTimes},</if>
+            <if test="DTaPLastTime != null">dtap_last_time = #{DTaPLastTime},</if>
+            <if test="DTTimes != null">dt_times = #{DTTimes},</if>
+            <if test="DTLastTime != null">dt_last_time = #{DTLastTime},</if>
+            <if test="MMRTimes != null">mmr_times = #{MMRTimes},</if>
+            <if test="MMRLastTime != null">mmr_last_time = #{MMRLastTime},</if>
+            <if test="JEVLTimes != null">jevl_times = #{JEVLTimes},</if>
+            <if test="JEVLLastTime != null">jevl_last_time = #{JEVLLastTime},</if>
+            <if test="GACPVTimes != null">gacpv_times = #{GACPVTimes},</if>
+            <if test="GACPVLastTime != null">gacpv_last_time = #{GACPVLastTime},</if>
+        </set>
+        WHERE child_id = #{childId}
+    </update>
+
+</mapper>

@@ -1,17 +1,25 @@
 package com.parent.service.service.impl;
 
 import com.child.common.constants.Constant;
+import com.child.common.entity.enums.ChildVaccineEnum;
 import com.child.common.entity.po.Child;
 import com.child.common.entity.po.Family;
+import com.child.common.entity.po.VaccineRecord;
 import com.child.common.entity.vo.GrowthConditionVO;
 import com.child.common.entity.vo.ResponseCodeEnum;
 import com.child.common.exception.BusinessException;
+import com.child.common.utils.ChildVaccineUtil;
 import com.child.common.utils.StringTools;
 import com.parent.service.mapper.ChildMapper;
 import com.parent.service.mapper.UserMapper;
+import com.parent.service.mapper.VaccineRecordMapper;
 import com.parent.service.service.ChildService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import java.util.Date;
+import java.util.Optional;
 
 @Service
 public class ChildServiceImpl implements ChildService {
@@ -20,6 +28,8 @@ public class ChildServiceImpl implements ChildService {
     private UserMapper userMapper;
     @Resource
     private ChildMapper childMapper;
+    @Resource
+    private VaccineRecordMapper vaccineRecordMapper;
     @Override
     public void addChild(String familyId, String childName, Integer sex,String idNumber) {
         Family checkIsExist = userMapper.selectFamilyById(familyId);
@@ -93,4 +103,96 @@ public class ChildServiceImpl implements ChildService {
         }
         return growthConditionVO;
     }
+
+    @Override
+    public VaccineRecord searchVaccine(String childId) {
+        Child child = childMapper.selectById(childId);
+        if (child == null){
+            throw new BusinessException(ResponseCodeEnum.CODE_602);
+        }
+        Child newChild = childMapper.selectChildFromVaccineRecord(childId);
+        if (newChild == null){
+            childMapper.insertVaccineRecord(childId);
+            return null;
+        }
+        return childMapper.selectVaccineRecord(childId);
+    }
+
+    @Override
+    public void updateVaccine(String childId, String vaccine) {
+        Optional<ChildVaccineEnum> vaccineEnumOpt = ChildVaccineUtil.getEnumByVaccineDesc(vaccine);
+        if (vaccineEnumOpt.isEmpty()){
+            throw new BusinessException("未匹配到对应的疫苗类型：" + vaccine);
+        }
+        VaccineRecord record = vaccineRecordMapper.selectByChildId(childId);
+        if (record == null) {
+            record = new VaccineRecord();
+            record.setChildId(childId);
+        }
+        Date now = new Date();
+        String vaccineType = ChildVaccineUtil.getVaccineTypeFromDesc(vaccine);
+        Integer needleNum = ChildVaccineUtil.getNeedleNumFromDesc(vaccine) ;
+        updateRecordByVaccineType(record,vaccineType,needleNum,now);
+        if (record.getChildId() != null && vaccineRecordMapper.selectByChildId(childId) != null) {
+            vaccineRecordMapper.updateByChildId(record);
+        } else {
+            vaccineRecordMapper.insert(record);
+        }
+    }
+
+    /**
+     * 根据疫苗类型更新对应字段
+     * @param record 接种记录
+     * @param vaccineType 疫苗类型（如乙肝、卡介苗）
+     * @param needleNum 针次
+     * @param inoculateTime 接种时间
+     */
+    private void updateRecordByVaccineType(VaccineRecord record, String vaccineType, Integer needleNum, Date inoculateTime) {
+        switch (vaccineType) {
+            case "卡介苗":
+                record.setBCGVTimes(needleNum);
+                record.setBCGLastTime(inoculateTime);
+                break;
+            case "乙肝":
+                record.setHBVTimes(needleNum);
+                record.setHBVLastTime(inoculateTime);
+                break;
+            case "脊髓灰质炎":
+                record.setOPVTimes(needleNum);
+                record.setOPVLastTime(inoculateTime);
+                break;
+            case "百白破":
+                record.setDTaPTimes(needleNum);
+                record.setDTaPLastTime(inoculateTime);
+                break;
+            case "麻腮风":
+                record.setMMRTimes(needleNum);
+                record.setMMRLastTime(inoculateTime);
+                break;
+            case "乙脑":
+                record.setJEVLTimes(needleNum);
+                record.setJEVLLastTime(inoculateTime);
+                break;
+            case "A群流脑":
+                record.setGACPVTimes(needleNum);
+                record.setGACPVLastTime(inoculateTime);
+                break;
+            case "甲肝":
+                record.setHAVTimes(needleNum);
+                record.setHAVLastTime(inoculateTime);
+                break;
+            case "白破":
+                record.setDTTimes(needleNum);
+                record.setDTLastTime(inoculateTime);
+                break;
+            case "AC群流脑":
+                // 注：原PO中AC群流脑字段复用了GACPV，需确认是否新增字段，此处先复用
+                record.setGACPVTimes(needleNum);
+                record.setGACPVLastTime(inoculateTime);
+                break;
+            default:
+                throw new BusinessException("不支持的疫苗类型：" + vaccineType);
+        }
+    }
+
 }
