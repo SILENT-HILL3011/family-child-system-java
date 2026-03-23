@@ -1,5 +1,5 @@
 package com.parent.service.service;
 
 public interface ChildService {
-    void addChild(String familyId, String childName, Integer sex);
+    void addChild(String familyId, String childName, Integer sex,String idNumber);
 }

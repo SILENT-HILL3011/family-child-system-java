@@ -8,6 +8,6 @@ public interface ChildMapper {
     @Select("select * from child_info where child_name = #{childName} and family_id = #{familyId}")
     Child selectByNameAndFamilyId(String childName, String familyId);
 
-    @Insert("insert into child_info(child_id, child_name, family_id, sex) values(#{childId},#{childName},#{familyId},#{sex})")
+    @Insert("insert into child_info(child_id, child_name, family_id, sex,idnumber) values(#{childId},#{childName},#{familyId},#{sex},#{idNumber})")
     void insert(Child child);
 }

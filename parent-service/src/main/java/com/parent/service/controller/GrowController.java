@@ -1,5 +1,6 @@
 package com.parent.service.controller;
 
+import com.child.common.annotation.GlobalInterceptor;
 import com.child.common.result.R;
 import com.parent.service.service.ChildService;
 import jakarta.annotation.Resource;
@@ -18,13 +19,14 @@ public class GrowController {
     private ChildService childService;
 
     @RequestMapping("/addChild")
-    public R addChild(@NotEmpty String familyId, @NotEmpty String childName, @NotNull Integer sex){
-        childService.addChild(familyId,childName,sex);
+    @GlobalInterceptor(checkLogin = true)
+    public R addChild(@NotEmpty String familyId, @NotEmpty String childName, @NotNull Integer sex,@NotEmpty String idNumber){
+        childService.addChild(familyId,childName,sex,idNumber);
         return R.success();
     }
     @RequestMapping("/updateChildInfo")
+    @GlobalInterceptor(checkLogin = true)
     public R updateChildInfo(@NotEmpty String childId){
-
         return R.success();
     }
 }

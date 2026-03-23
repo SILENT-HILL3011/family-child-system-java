@@ -100,6 +100,12 @@ public class UserServiceImpl implements UserService {
         if (user.getSex() != null){
             updateUser.setSex(user.getSex());
         }
+        if (user.getAddress() != null){
+            updateUser.setAddress(user.getAddress());
+        }
+        if (user.getMail() != null){
+            updateUser.setMail(user.getMail());
+        }
         userMapper.updateUserInfo(updateUser);
         return null;
     }

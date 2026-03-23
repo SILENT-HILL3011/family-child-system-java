@@ -20,7 +20,7 @@ public class ChildServiceImpl implements ChildService {
     @Resource
     private ChildMapper childMapper;
     @Override
-    public void addChild(String familyId, String childName, Integer sex) {
+    public void addChild(String familyId, String childName, Integer sex,String idNumber) {
         Family checkIsExist = userMapper.selectFamilyById(familyId);
         if (checkIsExist == null){
             throw new BusinessException(ResponseCodeEnum.CODE_600);
@@ -34,6 +34,7 @@ public class ChildServiceImpl implements ChildService {
         child.setSex(sex);
         child.setChildId(StringTools.getRandomNumber(Constant.LENGTH_12));
         child.setFamilyId(familyId);
+        child.setIdNumber(idNumber);
         childMapper.insert(child);
     }
 }

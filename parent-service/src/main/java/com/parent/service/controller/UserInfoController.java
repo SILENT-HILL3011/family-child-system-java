@@ -41,18 +41,20 @@ public class UserInfoController {
     }
 
     @RequestMapping("/createFamily")
+    @GlobalInterceptor(checkLogin = true)
     public R createFamily(@NotEmpty String userId,@NotEmpty String familyName,@NotEmpty String seniority){
         userService.createFamily(userId,familyName,seniority);
         return R.success();
     }
 
     @RequestMapping("/updateUserInfo")
-//    @GlobalInterceptor(checkLogin = true)
+    @GlobalInterceptor(checkLogin = true)
     public R<User> updateUserInfo(@RequestBody User user){
         return R.success(userService.updateUserInfo(user));
     }
 
     @RequestMapping("/inviteMember")
+    @GlobalInterceptor(checkLogin = true)
     public R inviteMember(@NotEmpty String phoneNumber,@NotEmpty String familyId,@NotEmpty String seniority,@NotNull Integer role){
         userService.inviteMember(phoneNumber,familyId,seniority,role);
         return R.success();
