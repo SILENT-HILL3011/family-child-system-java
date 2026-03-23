@@ -4,6 +4,33 @@ public class Member {
     private String memberId;
     private String familyId;
     private String memberName;
+    private String seniority;
+    private Integer role;
+    private String phone;
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
+    }
+
+    public String getSeniority() {
+        return seniority;
+    }
+
+    public void setSeniority(String seniority) {
+        this.seniority = seniority;
+    }
 
     public String getMemberId() {
         return memberId;

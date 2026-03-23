@@ -10,6 +10,7 @@ import com.parent.service.service.UserService;
 import com.wf.captcha.ArithmeticCaptcha;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,32 +29,35 @@ public class UserInfoController {
 
 
     @RequestMapping("/login")
-    public R<UserLoginVO> login( @NotEmpty String phoneNumber, @NotEmpty String password){
-        UserLoginVO userLoginVO = userService.login(phoneNumber, password);
-        return R.success(userLoginVO);
+    public R login( @NotEmpty String phoneNumber, @NotEmpty String password){
+        userService.login(phoneNumber, password);
+        return R.success();
     }
 
     @RequestMapping("/register")
-    public R<UserLoginVO> register(@NotEmpty String phoneNumber, @NotEmpty String password){
-        userService.register(phoneNumber, password);
+    public R<UserLoginVO> register(@NotEmpty String phoneNumber, @NotEmpty String password, @NotNull Integer role){
+        userService.register(phoneNumber, password,role);
         return R.success();
     }
 
     @RequestMapping("/createFamily")
-    public R createFamily(@NotEmpty String userId,@NotEmpty String familyName){
-        userService.createFamily(userId,familyName);
+    public R createFamily(@NotEmpty String userId,@NotEmpty String familyName,@NotEmpty String seniority){
+        userService.createFamily(userId,familyName,seniority);
         return R.success();
     }
 
     @RequestMapping("/updateUserInfo")
-    @GlobalInterceptor(checkLogin = true)
+//    @GlobalInterceptor(checkLogin = true)
     public R<User> updateUserInfo(@RequestBody User user){
         return R.success(userService.updateUserInfo(user));
     }
 
-    @RequestMapping("/addMember")
-    public R addMember(@NotEmpty String familyId,@NotEmpty String memberName){
-        userService.addMember(familyId,memberName);
+    @RequestMapping("/inviteMember")
+    public R inviteMember(@NotEmpty String phoneNumber,@NotEmpty String familyId,@NotEmpty String seniority,@NotNull Integer role){
+        userService.inviteMember(phoneNumber,familyId,seniority,role);
         return R.success();
     }
+
+
+
 }

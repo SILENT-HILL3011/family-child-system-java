@@ -6,13 +6,13 @@ import com.child.common.vo.UserLoginVO;
 import java.util.List;
 
 public interface UserService {
-     UserLoginVO register(String phoneNumber, String password);
+     void register(String phoneNumber, String password,Integer role);
 
      User updateUserInfo(User user);
 
      UserLoginVO login(String phoneNumber, String password);
 
-     void createFamily(String userId, String familyName);
+     void createFamily(String userId, String familyName,String seniority);
 
-     void addMember(String familyId, String memberName);
+     void inviteMember(String phoneNumber, String familyId,String seniority,Integer role);
 }

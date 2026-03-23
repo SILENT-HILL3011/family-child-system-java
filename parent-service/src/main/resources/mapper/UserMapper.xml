@@ -37,10 +37,6 @@
             <if test="sex != null">
                 sex = #{sex},
             </if>
-            <!-- 4. 是否有家庭：允许更新为null/false -->
-            <if test="haveFamily != null">
-                have_family = #{haveFamily},
-            </if>
         </set>
         WHERE user_id = #{id}
     </update>
