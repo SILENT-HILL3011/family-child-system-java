@@ -2,22 +2,20 @@ package com.parent.service.service.impl;
 
 import com.child.common.constants.Constant;
 import com.child.common.entity.enums.ChildVaccineEnum;
-import com.child.common.entity.po.Child;
-import com.child.common.entity.po.Examination;
-import com.child.common.entity.po.Family;
-import com.child.common.entity.po.VaccineRecord;
+import com.child.common.entity.enums.TimePerEnum;
+import com.child.common.entity.po.*;
 import com.child.common.entity.vo.GrowthConditionVO;
 import com.child.common.entity.vo.ResponseCodeEnum;
 import com.child.common.exception.BusinessException;
 import com.child.common.utils.ChildVaccineUtil;
 import com.child.common.utils.StringTools;
 import com.parent.service.mapper.ChildMapper;
+import com.parent.service.mapper.DailyTimeMapper;
 import com.parent.service.mapper.UserMapper;
 import com.parent.service.mapper.VaccineRecordMapper;
 import com.parent.service.service.ChildService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,6 +29,8 @@ public class ChildServiceImpl implements ChildService {
     private ChildMapper childMapper;
     @Resource
     private VaccineRecordMapper vaccineRecordMapper;
+    @Resource
+    private DailyTimeMapper dailyTimeMapper;
 
     @Override
     public void addChild(String familyId, String childName, Integer sex,String idNumber) {
@@ -184,6 +184,26 @@ public class ChildServiceImpl implements ChildService {
         newExamination.setExaminationTime(new Date());
         childMapper.updateExamination(newExamination);
         return newExamination;
+    }
+
+    @Override
+    public void recordFood(String childId, Integer time, String food) {
+        DailyTime dailyTime = new DailyTime();
+        dailyTime.setChildId(childId);
+        dailyTime.setTime(TimePerEnum.getDescByCode(time));
+        dailyTime.setFood(food);
+        dailyTime.setRecordTime(new Date());
+        dailyTimeMapper.insert4Food(dailyTime);
+    }
+
+    @Override
+    public void recordSleep(String childId, Integer time, Integer sleepTime) {
+        DailyTime dailyTime = new DailyTime();
+        dailyTime.setChildId(childId);
+        dailyTime.setTime(TimePerEnum.getDescByCode(time));
+        dailyTime.setSleepTime(sleepTime);
+        dailyTime.setRecordTime(new Date());
+        dailyTimeMapper.insert4Sleep(dailyTime);
     }
 
     private int getValue(Integer num) {

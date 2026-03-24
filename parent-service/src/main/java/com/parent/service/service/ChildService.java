@@ -21,4 +21,8 @@ public interface ChildService {
     List<String> searchVaccineThisYear(String childId);
 
     Examination appointExamination(String childId, String doctorId);
+
+    void recordFood(String childId, Integer time, String food);
+
+    void recordSleep(String childId, Integer time, Integer sleepTime);
 }

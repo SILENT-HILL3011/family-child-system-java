@@ -5,6 +5,8 @@ import com.child.common.entity.po.Child;
 import com.child.common.entity.po.Examination;
 import com.child.common.entity.po.VaccineRecord;
 import com.child.common.entity.vo.GrowthConditionVO;
+import com.child.common.entity.vo.ResponseCodeEnum;
+import com.child.common.exception.BusinessException;
 import com.child.common.result.R;
 import com.parent.service.service.ChildService;
 import jakarta.annotation.Resource;
@@ -67,5 +69,23 @@ public class GrowController {
         Examination examination = childService.appointExamination(childId,doctorId);
         return R.success(examination);
     }
+
+    @RequestMapping("/recordLive")
+    public R recordLive(@NotEmpty String childId,@NotNull Integer time,String food,Integer sleepTime){
+        if (time == 1 || time == 2 || time == 4){
+            childService.recordFood(childId,time,food);
+        } else if (time == 3 || time == 5){
+            childService.recordSleep(childId,time,sleepTime);
+        } else {
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        return R.success();
+    }
+
+//    @RequestMapping("/searchLive")
+//    public R<List<String>> searchLive(@NotEmpty String childId,){
+//        List<String> live = childService.searchLive(childId);
+//        return R.success(live);
+//    }
 
 }
