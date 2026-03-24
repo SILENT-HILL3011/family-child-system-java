@@ -1,6 +1,7 @@
 package com.parent.service.mapper;
 
 import com.child.common.entity.po.Child;
+import com.child.common.entity.po.Examination;
 import com.child.common.entity.po.VaccineRecord;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
@@ -30,5 +31,9 @@ public interface ChildMapper {
     void insertVaccineRecord(String childId);
 
 
-    void updateVaccineRecord(String childId, String vaccine, Date curDate);
+    @Select("select * from personal_examination_record where doctor_id = #{doctorId}")
+    Examination selectExaminationByDoctorId(String doctorId);
+
+    @Insert("insert into personal_examination_record(child_id,ischecked,doctor_id,examination_id,appointment_time) values(#{childId},#{isChecked},#{doctorId},#{examinationId},#{examinationTime})")
+    void updateExamination(Examination examination);
 }

@@ -3,6 +3,7 @@ package com.parent.service.service.impl;
 import com.child.common.constants.Constant;
 import com.child.common.entity.enums.ChildVaccineEnum;
 import com.child.common.entity.po.Child;
+import com.child.common.entity.po.Examination;
 import com.child.common.entity.po.Family;
 import com.child.common.entity.po.VaccineRecord;
 import com.child.common.entity.vo.GrowthConditionVO;
@@ -30,6 +31,7 @@ public class ChildServiceImpl implements ChildService {
     private ChildMapper childMapper;
     @Resource
     private VaccineRecordMapper vaccineRecordMapper;
+
     @Override
     public void addChild(String familyId, String childName, Integer sex,String idNumber) {
         Family checkIsExist = userMapper.selectFamilyById(familyId);
@@ -166,6 +168,22 @@ public class ChildServiceImpl implements ChildService {
         }
 
         return result;
+    }
+
+    @Override
+    public Examination appointExamination(String childId, String doctorId) {
+        Examination examination = childMapper.selectExaminationByDoctorId(doctorId);
+        if (examination == null){
+            return null;
+        }
+        Examination newExamination = new Examination();
+        newExamination.setExaminationId(StringTools.getRandomNumber(Constant.LENGTH_12));
+        newExamination.setChildId(childId);
+        newExamination.setChecked(Constant.IS);
+        newExamination.setDoctorId(doctorId);
+        newExamination.setExaminationTime(new Date());
+        childMapper.updateExamination(newExamination);
+        return newExamination;
     }
 
     private int getValue(Integer num) {

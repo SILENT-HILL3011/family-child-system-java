@@ -2,6 +2,7 @@ package com.parent.service.controller;
 
 import com.child.common.annotation.GlobalInterceptor;
 import com.child.common.entity.po.Child;
+import com.child.common.entity.po.Examination;
 import com.child.common.entity.po.VaccineRecord;
 import com.child.common.entity.vo.GrowthConditionVO;
 import com.child.common.result.R;
@@ -61,5 +62,10 @@ public class GrowController {
         return R.success(notDoneVaccine);
     }
 
+    @RequestMapping("/appointExamination")
+    public R<Examination> appointExamination(@NotEmpty String childId,@NotEmpty String doctorId){
+        Examination examination = childService.appointExamination(childId,doctorId);
+        return R.success(examination);
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.parent.service.service;
 
 import com.child.common.entity.po.Child;
+import com.child.common.entity.po.Examination;
 import com.child.common.entity.po.VaccineRecord;
 import com.child.common.entity.vo.GrowthConditionVO;
 
@@ -18,4 +19,6 @@ public interface ChildService {
     void updateVaccine(String childId, String vaccine);
 
     List<String> searchVaccineThisYear(String childId);
+
+    Examination appointExamination(String childId, String doctorId);
 }

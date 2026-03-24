@@ -14,4 +14,7 @@ public class Constant {
     public static final String TOKEN_HEADER_KEY = "token";
 
     public static final String PATTERN_DATETIME = "yyyy-MM-dd HH:mm:ss";
+
+    public static final Integer IS = 1;
+    public static final Integer NO = 0;
 }

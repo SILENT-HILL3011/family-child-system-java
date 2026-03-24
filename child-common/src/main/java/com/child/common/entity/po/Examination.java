@@ -8,7 +8,15 @@ public class Examination {
     private String doctorId;
     private String childId;
     private Date examinationTime;
-    private String hospitalLocation;
+    private Integer isChecked;
+
+    public Integer getChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(Integer checked) {
+        isChecked = checked;
+    }
 
     public String getExaminationId() {
         return examinationId;
@@ -42,11 +50,5 @@ public class Examination {
         this.examinationTime = examinationTime;
     }
 
-    public String getHospitalLocation() {
-        return hospitalLocation;
-    }
 
-    public void setHospitalLocation(String hospitalLocation) {
-        this.hospitalLocation = hospitalLocation;
-    }
 }
