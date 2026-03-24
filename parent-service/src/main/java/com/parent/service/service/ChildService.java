@@ -4,6 +4,8 @@ import com.child.common.entity.po.Child;
 import com.child.common.entity.po.VaccineRecord;
 import com.child.common.entity.vo.GrowthConditionVO;
 
+import java.util.List;
+
 public interface ChildService {
     void addChild(String familyId, String childName, Integer sex,String idNumber);
 
@@ -14,4 +16,6 @@ public interface ChildService {
     VaccineRecord searchVaccine(String childId);
 
     void updateVaccine(String childId, String vaccine);
+
+    List<String> searchVaccineThisYear(String childId);
 }

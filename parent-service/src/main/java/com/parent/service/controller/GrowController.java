@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/child/grow")
 @Validated
@@ -51,6 +53,12 @@ public class GrowController {
     public R updateVaccine(@NotEmpty String childId,@NotEmpty String vaccine){
         childService.updateVaccine(childId,vaccine);
         return R.success();
+    }
+
+    @RequestMapping("/searchVaccineThisYear")
+    public R<List<String>> searchVaccineThisYear(@NotEmpty String childId){
+        List<String> notDoneVaccine = childService.searchVaccineThisYear(childId);
+        return R.success(notDoneVaccine);
     }
 
 

@@ -16,6 +16,7 @@
     <modules>
         <module>child-common</module>
         <module>parent-service</module>
+        <module>expert-service</module>
     </modules>
 
     <properties>

@@ -13,6 +13,15 @@ public class Child {
     private Integer poetryCount;
     private String healthCondition;
     private String dietaryStatus;
+    private Integer age;
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
 
     public String getChildId() {
         return childId;

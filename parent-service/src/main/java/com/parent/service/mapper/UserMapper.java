@@ -17,7 +17,7 @@ public interface UserMapper {
     User selectByPhoneNumber(String phoneNumber);
 
 
-    @Update("insert into user_info(user_id, phone_number,password,role,have_family) values(#{id},#{phoneNumber},#{password},#{role},#{haveFamily})")
+    @Update("insert into user_info(user_id, phone_number,password,role,have_family) values(#{userId},#{phoneNumber},#{password},#{role},#{haveFamily})")
     void insert(User user);
 
     User selectById(String id);

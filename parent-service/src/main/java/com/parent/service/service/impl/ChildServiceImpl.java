@@ -18,8 +18,8 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ChildServiceImpl implements ChildService {
@@ -72,6 +72,9 @@ public class ChildServiceImpl implements ChildService {
         }
         if (child.getStatus() != null){
             check.setStatus(child.getStatus());
+        }
+        if (child.getAge() != null){
+            check.setAge(child.getAge());
         }
         childMapper.update(check);
     }
@@ -138,6 +141,74 @@ public class ChildServiceImpl implements ChildService {
         } else {
             vaccineRecordMapper.insert(record);
         }
+    }
+
+    @Override
+    public List<String> searchVaccineThisYear(String childId) {
+        Child child = childMapper.selectById(childId);
+        if (child == null){
+            throw new BusinessException(ResponseCodeEnum.CODE_602);
+        }
+        Integer ageByMonth = child.getAge();
+        VaccineRecord record = vaccineRecordMapper.selectByChildId(childId);
+        if (record == null) {
+            record = new VaccineRecord(); // 无记录 = 全部未接种
+        }
+        List<ChildVaccineEnum> allShouldVaccine = Arrays.stream(ChildVaccineEnum.values())
+                .filter(v -> v.getMonths() <= ageByMonth)
+                .collect(Collectors.toList());
+        List<String> result = new ArrayList<>();
+        for (ChildVaccineEnum vaccineEnum : allShouldVaccine) {
+            boolean isNotDone = !isVaccineDone(record, vaccineEnum);
+            if (isNotDone) {
+                result.add(vaccineEnum.getVaccine()); // 返回疫苗名称
+            }
+        }
+
+        return result;
+    }
+
+    private int getValue(Integer num) {
+        return num == null ? 0 : num;
+    }
+
+    private int getNeedTimes(ChildVaccineEnum vaccineEnum) {
+        String[] split = vaccineEnum.name().split("_");
+        return Integer.parseInt(split[1]);
+    }
+    private boolean isVaccineDone(VaccineRecord record, ChildVaccineEnum vaccineEnum) {
+        String name = vaccineEnum.name();
+        int needTimes = getNeedTimes(vaccineEnum);
+
+        // 按疫苗类型判断已接种次数 >= 需要针次
+        if (name.startsWith("HBV")) {
+            return getValue(record.getHBVTimes()) >= needTimes;
+        }
+        if (name.startsWith("BCGV")) {
+            return getValue(record.getBCGVTimes()) >= needTimes;
+        }
+        if (name.startsWith("OPV")) {
+            return getValue(record.getOPVTimes()) >= needTimes;
+        }
+        if (name.startsWith("DTaP")) {
+            return getValue(record.getDTaPTimes()) >= needTimes;
+        }
+        if (name.startsWith("HAV")) {
+            return getValue(record.getHAVTimes()) >= needTimes;
+        }
+        if (name.startsWith("MMR")) {
+            return getValue(record.getMMRTimes()) >= needTimes;
+        }
+        if (name.startsWith("JEVL")) {
+            return getValue(record.getJEVLTimes()) >= needTimes;
+        }
+        if (name.startsWith("GACPV") || name.startsWith("GACMV")) {
+            return getValue(record.getGACPVTimes()) >= needTimes;
+        }
+        if (name.startsWith("DT")) {
+            return getValue(record.getDTTimes()) >= needTimes;
+        }
+        return false;
     }
 
     /**

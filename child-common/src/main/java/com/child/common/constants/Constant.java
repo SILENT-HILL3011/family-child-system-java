@@ -13,5 +13,5 @@ public class Constant {
     public static final String REDIS_KEY_CHECK_CODE = REDIS_KEY_PREFIX + "checkcode:";
     public static final String TOKEN_HEADER_KEY = "token";
 
-
+    public static final String PATTERN_DATETIME = "yyyy-MM-dd HH:mm:ss";
 }

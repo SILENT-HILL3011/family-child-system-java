@@ -38,6 +38,9 @@
             <if test="poetryCount != null">
                 poetrycount = #{poetryCount},
             </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
         </set>
     </update>
 
