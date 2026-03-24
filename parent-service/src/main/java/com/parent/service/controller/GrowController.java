@@ -2,6 +2,7 @@ package com.parent.service.controller;
 
 import com.child.common.annotation.GlobalInterceptor;
 import com.child.common.entity.po.Child;
+import com.child.common.entity.po.DailyTime;
 import com.child.common.entity.po.Examination;
 import com.child.common.entity.po.VaccineRecord;
 import com.child.common.entity.vo.GrowthConditionVO;
@@ -82,10 +83,10 @@ public class GrowController {
         return R.success();
     }
 
-//    @RequestMapping("/searchLive")
-//    public R<List<String>> searchLive(@NotEmpty String childId,){
-//        List<String> live = childService.searchLive(childId);
-//        return R.success(live);
-//    }
+    @RequestMapping("/searchLive")
+    public R<List<DailyTime>> searchLive(@NotEmpty String childId){
+        List<DailyTime> dailyTimes = childService.searchLive(childId);
+        return R.success(dailyTimes);
+    }
 
 }

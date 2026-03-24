@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.parent.service.mapper.DailyTimeMapper">
+
+    <resultMap id="DailyTimeResultMap" type="com.child.common.entity.po.DailyTime">
+        <id column="child_id" property="childId"/>
+        <result column="time" property="time"/>
+        <result column="food" property="food"/>
+        <result column="record_time" property="recordTime"/>
+        <result column="sleep_time" property="sleepTime"/>
+    </resultMap>
+
+    <select id="selectWeeklyRecordsByChildId" resultMap="DailyTimeResultMap">
+        SELECT *
+        FROM daily_time
+        WHERE child_id = #{childId}
+          AND record_time >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        ORDER BY record_time ASC
+    </select>
+
+</mapper>

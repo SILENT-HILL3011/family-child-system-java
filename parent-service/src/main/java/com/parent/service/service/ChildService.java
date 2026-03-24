@@ -1,6 +1,7 @@
 package com.parent.service.service;
 
 import com.child.common.entity.po.Child;
+import com.child.common.entity.po.DailyTime;
 import com.child.common.entity.po.Examination;
 import com.child.common.entity.po.VaccineRecord;
 import com.child.common.entity.vo.GrowthConditionVO;
@@ -25,4 +26,6 @@ public interface ChildService {
     void recordFood(String childId, Integer time, String food);
 
     void recordSleep(String childId, Integer time, Integer sleepTime);
+
+    List<DailyTime> searchLive(String childId);
 }

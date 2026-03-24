@@ -206,6 +206,15 @@ public class ChildServiceImpl implements ChildService {
         dailyTimeMapper.insert4Sleep(dailyTime);
     }
 
+    @Override
+    public List<DailyTime> searchLive(String childId) {
+        List<DailyTime> dailyTimeListOfWeek = dailyTimeMapper.selectWeeklyRecordsByChildId(childId);
+        if (dailyTimeListOfWeek == null){
+            return new ArrayList<>();
+        }
+        return dailyTimeListOfWeek;
+    }
+
     private int getValue(Integer num) {
         return num == null ? 0 : num;
     }
