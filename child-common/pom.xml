@@ -20,6 +20,7 @@
         <commons.text.version>1.11.0</commons.text.version>
         <captcha.version>1.6.2</captcha.version>
         <aspectjweaver.version>1.9.4</aspectjweaver.version>
+        <pagehelper.version>1.4.6</pagehelper.version>
     </properties>
 
     <dependencies>
@@ -72,6 +73,12 @@
             <groupId>org.graalvm.js</groupId>
             <artifactId>js</artifactId>
             <version>22.3.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>${pagehelper.version}</version>
         </dependency>
     </dependencies>
 

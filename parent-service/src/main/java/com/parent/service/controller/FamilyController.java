@@ -3,6 +3,7 @@ package com.parent.service.controller;
 import com.child.common.entity.po.TaskInfo;
 import com.child.common.entity.vo.MessageBoardVO;
 import com.child.common.result.R;
+import com.github.pagehelper.PageInfo;
 import com.parent.service.service.FamilyService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotEmpty;
@@ -52,14 +53,33 @@ public class FamilyController {
     }
 
     @RequestMapping("/searchMessage")
-    public R<List<MessageBoardVO>> searchMessage(@NotEmpty String familyId,@NotEmpty String publisherId,Integer timePeriod){
-        List<MessageBoardVO> messageBoardVOList = familyService.searchMessage(familyId,publisherId,timePeriod);
+    public R<PageInfo<MessageBoardVO>> searchMessageByPage(@NotEmpty String familyId, @NotEmpty String publisherId,
+                                                     Integer timePeriod,Integer pageNum){
+        PageInfo<MessageBoardVO> messageBoardVOList = familyService.searchMessageByPage(familyId,publisherId,timePeriod,pageNum);
         return R.success(messageBoardVOList);
     }
 
     @RequestMapping("/likeMessage")
-    public R<MessageBoardVO> likeMessage(@NotEmpty String familyId,@NotEmpty String publisherId,Integer timePeriod){
-        MessageBoardVO messageBoardVO = familyService.likeMessage(familyId,publisherId,timePeriod);
+    public R<MessageBoardVO> likeMessage(@NotEmpty String messageId){
+        MessageBoardVO messageBoardVO = familyService.likeMessage(messageId);
         return R.success(messageBoardVO);
+    }
+
+    @RequestMapping("/applyToMessage")
+    public R<MessageBoardVO> applyToMessage(@NotEmpty String messageId,@NotEmpty String content){
+        MessageBoardVO messageBoardVO = familyService.applyToMessage(messageId,content);
+        return R.success(messageBoardVO);
+    }
+
+    @RequestMapping("/searchComment")
+    public R<List<String>> searchComment(@NotEmpty String messageId){
+        List<String> comments = familyService.searchComment(messageId);
+        return R.success(comments);
+    }
+
+    @RequestMapping("/applyToComment")
+    public R applyToComment(@NotEmpty String commentId,@NotEmpty String content){
+        familyService.applyToComment(commentId,content);
+        return R.success();
     }
 }

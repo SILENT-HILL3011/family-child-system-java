@@ -6,6 +6,8 @@ import com.child.common.entity.vo.MessageBoardVO;
 import com.child.common.exception.BusinessException;
 import com.child.common.utils.DateUtils;
 import com.child.common.utils.StringTools;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.parent.service.mapper.MessageMapper;
 import com.parent.service.mapper.TaskMapper;
 import com.parent.service.mapper.UserMapper;
@@ -105,7 +107,115 @@ public class FamilyServiceImpl implements FamilyService {
     }
 
     @Override
-    public List<MessageBoardVO> searchMessage(String familyId, String publisherId, Integer timePeriod) {
+    public PageInfo<MessageBoardVO> searchMessageByPage(String familyId, String publisherId, Integer timePeriod,Integer pageNum) {
+        if (timePeriod == null){
+            timePeriod = Constant.NUM_ONE;
+        }
+        if (timePeriod != 1 && timePeriod != 7 && timePeriod != 30) {
+            throw new BusinessException("时间段错误");
+        }
+        if (pageNum != null){
+            pageNum = Constant.NUM_ONE;
+        }
+        PageHelper.startPage(pageNum, 10);
+        Member member = userMapper.selectFamilyByMemberId(publisherId);
+        Family family = userMapper.selectFamilyById(familyId);
+        List<MessageBoard> messageBoards = messageMapper.selectMessage(familyId, publisherId, timePeriod);
+        List<MessageBoardVO> messageBoardVOList = new ArrayList<>();
+        for (MessageBoard messageBoard : messageBoards) {
+            MessageBoardVO messageBoardVO = new MessageBoardVO();
+            messageBoardVO.setMessageId(messageBoard.getMessageId());
+            messageBoardVO.setFamilyName(family.getFamilyName());
+            messageBoardVO.setPublisherName(member.getMemberName());
+            messageBoardVO.setContent(messageBoard.getContent());
+            messageBoardVO.setImageUrl(messageBoard.getImageUrl());
+            messageBoardVO.setPublishTime(messageBoard.getPublishTime());
+            messageBoardVO.setLikeCount(messageBoard.getLikeCount());
+            messageBoardVO.setCommentCount(messageBoard.getCommentCount());
+            messageBoardVOList.add(messageBoardVO);
+        }
+        return new PageInfo<>(messageBoardVOList);
+    }
+
+    @Override
+    public MessageBoardVO likeMessage(String messageId) {
+        MessageBoard likeMessageBoard = messageMapper.selectMessageById(messageId);
+        if (likeMessageBoard == null){
+            throw new BusinessException("消息不存在");
+        }
+        Member member = userMapper.selectFamilyByMemberId(likeMessageBoard.getPublisherId());
+        Family family = userMapper.selectFamilyById(likeMessageBoard.getFamilyId());
+        MessageBoardVO likeMessageVO = new MessageBoardVO();
+        likeMessageVO.setMessageId(likeMessageBoard.getMessageId());
+        likeMessageVO.setFamilyName(family.getFamilyName());
+        likeMessageVO.setPublisherName(member.getMemberName());
+        likeMessageVO.setContent(likeMessageBoard.getContent());
+        likeMessageVO.setImageUrl(likeMessageBoard.getImageUrl());
+        likeMessageVO.setPublishTime(likeMessageBoard.getPublishTime());
+        likeMessageVO.setLikeCount(likeMessageBoard.getLikeCount() + 1);
+        likeMessageVO.setCommentCount(likeMessageBoard.getCommentCount());
+        messageMapper.updateMessage(likeMessageVO);
+        MessageLike messageLike = new MessageLike();
+        messageLike.setLikeId(StringTools.getRandomNumber(Constant.LENGTH_12));
+        messageLike.setMessageId(likeMessageVO.getMessageId());
+        messageLike.setUserId(likeMessageBoard.getPublisherId());
+        messageLike.setLikeTime(new Date());
+        messageMapper.insertMessageLike(messageLike);
+        return likeMessageVO;
+        // TODO 重复点赞是取消点赞
+    }
+
+    @Override
+    public MessageBoardVO applyToMessage(String messageId, String content) {
+        MessageBoard likeMessageBoard = messageMapper.selectMessageById(messageId);
+        if (likeMessageBoard == null){
+            throw new BusinessException("消息不存在");
+        }
+        Member member = userMapper.selectFamilyByMemberId(likeMessageBoard.getPublisherId());
+        Family family = userMapper.selectFamilyById(likeMessageBoard.getFamilyId());
+        MessageBoardVO applyMessageVO = new MessageBoardVO();
+        applyMessageVO.setMessageId(likeMessageBoard.getMessageId());
+        applyMessageVO.setFamilyName(family.getFamilyName());
+        applyMessageVO.setPublisherName(member.getMemberName());
+        applyMessageVO.setContent(likeMessageBoard.getContent());
+        applyMessageVO.setImageUrl(likeMessageBoard.getImageUrl());
+        applyMessageVO.setPublishTime(likeMessageBoard.getPublishTime());
+        applyMessageVO.setLikeCount(likeMessageBoard.getLikeCount());
+        applyMessageVO.setCommentCount(likeMessageBoard.getCommentCount() + 1);
+        messageMapper.updateMessage(applyMessageVO);
+        MessageComment messageComment = new MessageComment();
+        messageComment.setCommentId(StringTools.getRandomNumber(Constant.LENGTH_12));
+        messageComment.setMessageId(likeMessageBoard.getMessageId());
+        messageComment.setContent(content);
+        messageComment.setCommentTime(new Date());
+        messageComment.setUserId(likeMessageBoard.getPublisherId());
+        messageMapper.insertMessageComment(messageComment);
+        return applyMessageVO;
+    }
+
+    @Override
+    public List<String> searchComment(String messageId) {
+        List<String> messageComments = messageMapper.selectComment(messageId);
+        return messageComments;
+    }
+
+    @Override
+    public void applyToComment(String commentId, String content) {
+        MessageComment messageComment = messageMapper.selectMessageCommentById(commentId);
+        if (messageComment == null){
+            throw new BusinessException("评论不存在");
+        }
+        MessageComment applyComment = new MessageComment();
+        applyComment.setUserId(messageComment.getUserId());
+        applyComment.setCommentId(StringTools.getRandomNumber(Constant.LENGTH_12));
+        applyComment.setMessageId(messageComment.getMessageId());
+        applyComment.setContent(content);
+        applyComment.setCommentTime(new Date());
+        applyComment.setReplyToId(messageComment.getCommentId());
+        messageMapper.insertMessageComment(applyComment);
+    }
+
+    private List<MessageBoardVO> searchMessage(String familyId, String publisherId, Integer timePeriod) {
         if (timePeriod == null){
             timePeriod = Constant.NUM_ONE;
         }
@@ -129,23 +239,6 @@ public class FamilyServiceImpl implements FamilyService {
             messageBoardVOList.add(messageBoardVO);
         }
         return messageBoardVOList;
-    }
-
-    @Override
-    public MessageBoardVO likeMessage(String familyId, String publisherId, Integer timePeriod) {
-        List<MessageBoardVO> messageBoardVOList = searchMessage(familyId, publisherId, timePeriod);
-        MessageBoardVO likeMessageVO = messageBoardVOList.get(0);
-        likeMessageVO.setLikeCount(likeMessageVO.getLikeCount() + 1);
-        messageMapper.updateMessage(likeMessageVO);
-        MessageLike messageLike = new MessageLike();
-        messageLike.setLikeId(StringTools.getRandomNumber(Constant.LENGTH_12));
-        messageLike.setMessageId(likeMessageVO.getMessageId());
-        messageLike.setUserId(publisherId);
-        messageLike.setLikeTime(new Date());
-        messageMapper.insertMessageLike(messageLike);
-        return likeMessageVO;
-
-        // TODO 重复点赞是取消点赞
     }
 
     @Scheduled(cron = "0 0 0 * * ?")
