@@ -1,5 +1,6 @@
 package com.parent.service.mapper;
 
+import com.child.common.entity.po.MessageBoard;
 import com.child.common.entity.po.TaskInfo;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
@@ -23,4 +24,6 @@ public interface TaskMapper {
     List<TaskInfo> selectUnfinishedExpiredTasks();
 
     void batchUpdateToFinished(List<String> taskIds);
+
+
 }

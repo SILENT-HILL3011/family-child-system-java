@@ -17,4 +17,8 @@ public class Constant {
 
     public static final Integer IS = 1;
     public static final Integer NO = 0;
+
+    public static final Integer NUM_ZERO = 0;
+    public static final Integer NUM_ONE = 1;
+
 }

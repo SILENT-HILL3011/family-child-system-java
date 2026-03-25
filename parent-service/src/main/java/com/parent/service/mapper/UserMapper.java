@@ -3,7 +3,6 @@ package com.parent.service.mapper;
 import com.child.common.entity.po.Family;
 import com.child.common.entity.po.Member;
 import com.child.common.entity.po.User;
-import com.child.common.vo.UserLoginVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -36,4 +35,9 @@ public interface UserMapper {
 
     @Update("update user_info set have_family = 1 where user_id = #{userId}")
     void updateUserFamily(String userId);
+
+    @Select("select * from member_info where member_id = #{memberId}")
+    Member selectFamilyByMemberId(String memberId);
+
+
 }

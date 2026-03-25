@@ -1,6 +1,7 @@
 package com.parent.service.controller;
 
 import com.child.common.entity.po.TaskInfo;
+import com.child.common.entity.vo.MessageBoardVO;
 import com.child.common.result.R;
 import com.parent.service.service.FamilyService;
 import jakarta.annotation.Resource;
@@ -42,5 +43,23 @@ public class FamilyController {
     public R<TaskInfo> finishTask(@NotEmpty String receiverId,@NotEmpty String taskName){
         TaskInfo taskInfo = familyService.finishTask(receiverId,taskName);
         return R.success(taskInfo);
+    }
+
+    @RequestMapping("/publishMessage")
+    public R publishMessage(@NotEmpty String publisherId,String content,String imageUrl){
+        familyService.publishMessage(publisherId,content,imageUrl);
+        return R.success();
+    }
+
+    @RequestMapping("/searchMessage")
+    public R<List<MessageBoardVO>> searchMessage(@NotEmpty String familyId,@NotEmpty String publisherId,Integer timePeriod){
+        List<MessageBoardVO> messageBoardVOList = familyService.searchMessage(familyId,publisherId,timePeriod);
+        return R.success(messageBoardVOList);
+    }
+
+    @RequestMapping("/likeMessage")
+    public R<MessageBoardVO> likeMessage(@NotEmpty String familyId,@NotEmpty String publisherId,Integer timePeriod){
+        MessageBoardVO messageBoardVO = familyService.likeMessage(familyId,publisherId,timePeriod);
+        return R.success(messageBoardVO);
     }
 }
