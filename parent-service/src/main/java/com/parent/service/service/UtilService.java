@@ -1,6 +1,8 @@
 package com.parent.service.service;
 
 import com.child.common.entity.po.ExpertInfo;
+import com.child.common.entity.po.MessageBoard;
+import com.child.common.entity.po.MessageBoardExpert;
 import com.child.common.entity.po.UtilInfo;
 import com.github.pagehelper.PageInfo;
 
@@ -15,4 +17,8 @@ public interface UtilService {
     PageInfo<ExpertInfo> getExpertByType(Integer type, Integer pageNum);
 
     void consultToExpert(String userId, String expertId, String message,String boardId);
+
+    PageInfo<MessageBoardExpert> searchMyMessage(String userId, Integer pageNum);
+
+    void finishMessage(String boardId);
 }

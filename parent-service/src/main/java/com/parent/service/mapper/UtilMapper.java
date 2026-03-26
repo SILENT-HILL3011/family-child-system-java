@@ -1,9 +1,6 @@
 package com.parent.service.mapper;
 
-import com.child.common.entity.po.ExpertInfo;
-import com.child.common.entity.po.MessageBoardExpert;
-import com.child.common.entity.po.MessageInfo;
-import com.child.common.entity.po.UtilInfo;
+import com.child.common.entity.po.*;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 
@@ -25,4 +22,6 @@ public interface UtilMapper {
 
     @Insert("insert into message_info(message_id,board_id,publisher_id,text,publish_date) values(#{messageId},#{boardId},#{publisherId},#{text},#{publishDate})")
     void insertMessageInfo(MessageInfo messageInfo);
+
+
 }

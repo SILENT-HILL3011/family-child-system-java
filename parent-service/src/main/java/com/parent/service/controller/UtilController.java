@@ -2,6 +2,8 @@ package com.parent.service.controller;
 
 import com.child.common.constants.Constant;
 import com.child.common.entity.po.ExpertInfo;
+import com.child.common.entity.po.MessageBoard;
+import com.child.common.entity.po.MessageBoardExpert;
 import com.child.common.entity.po.UtilInfo;
 import com.child.common.result.R;
 import com.github.pagehelper.PageInfo;
@@ -54,6 +56,17 @@ public class UtilController {
         String userId = "911168719308";
         utilService.consultToExpert(userId,expertId,message,boardId);
         return R.success("咨询成功");
+    }
+
+    @RequestMapping("/searchMyMessage")
+    public R<PageInfo<MessageBoardExpert>> searchMyMessage(@NotEmpty String userId, Integer pageNum){
+        return R.success(utilService.searchMyMessage(userId,pageNum));
+    }
+
+    @RequestMapping("/finishMessage")
+    public R finishMessage(@NotEmpty String boardId){
+        utilService.finishMessage(boardId);
+        return R.success("结束咨询成功");
     }
 
 }

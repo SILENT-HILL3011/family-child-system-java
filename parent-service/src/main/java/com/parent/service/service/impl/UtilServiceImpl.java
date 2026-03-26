@@ -2,10 +2,7 @@ package com.parent.service.service.impl;
 
 import com.child.common.constants.Constant;
 import com.child.common.entity.enums.ExpertTypeEnum;
-import com.child.common.entity.po.ExpertInfo;
-import com.child.common.entity.po.MessageBoardExpert;
-import com.child.common.entity.po.MessageInfo;
-import com.child.common.entity.po.UtilInfo;
+import com.child.common.entity.po.*;
 import com.child.common.utils.StringTools;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -81,5 +78,22 @@ public class UtilServiceImpl implements UtilService {
         messageBoardExpert.setMessageCount(messageBoardExpert.getMessageCount()+1);
         messageBoardExpertMapper.updateMessageBoardExpert(messageBoardExpert);
         utilMapper.insertMessageInfo(messageInfo);
+    }
+
+    @Override
+    public PageInfo<MessageBoardExpert> searchMyMessage(String userId,Integer pageNum) {
+        if (pageNum == null){
+            pageNum = Constant.NUM_ONE;
+        }
+        List<MessageBoardExpert> messageBoardList = messageBoardExpertMapper.searchMyMessage(userId);
+        PageHelper.startPage(pageNum, 10);
+        return PageInfo.of(messageBoardList);
+    }
+
+    @Override
+    public void finishMessage(String boardId) {
+        MessageBoardExpert messageBoardExpert = utilMapper.selectBoardExpertByBoardId(boardId);
+        messageBoardExpert.setIsFinished(Constant.IS);
+        messageBoardExpertMapper.finish(messageBoardExpert);
     }
 }
