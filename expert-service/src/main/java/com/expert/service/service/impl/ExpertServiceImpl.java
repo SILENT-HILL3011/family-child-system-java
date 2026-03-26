@@ -1,0 +1,60 @@
+package com.expert.service.service.impl;
+
+import com.child.common.constants.Constant;
+import com.child.common.entity.po.ExpertInfo;
+import com.child.common.entity.vo.ResponseCodeEnum;
+import com.child.common.exception.BusinessException;
+import com.child.common.redis.RedisComponent;
+import com.child.common.utils.StringTools;
+import com.expert.service.mapper.ExpertInfoMapper;
+import com.expert.service.service.ExpertService;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ExpertServiceImpl implements ExpertService {
+
+
+    @Resource
+    private ExpertInfoMapper expertInfoMapper;
+    @Resource
+    private RedisComponent redisComponent;
+    @Resource
+    private HttpServletRequest request;
+
+    @Override
+    public void register(String expertPhone, String expertPassword) {
+        ExpertInfo expertInfo = expertInfoMapper.selectByPhoneNumber(expertPhone);
+        if (expertInfo != null){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        expertInfo = new ExpertInfo();
+        expertInfo.setExpertId(StringTools.getRandomNumber(Constant.LENGTH_12));
+        expertInfo.setExpertPhone(expertPhone);
+        expertInfo.setExpertPassword(StringTools.getMd5(expertPassword));
+        expertInfoMapper.register(expertInfo);
+    }
+
+    @Override
+    public void login(String expertPhone, String expertPassword) {
+        ExpertInfo expertInfo = expertInfoMapper.selectByPhoneNumber(expertPhone);
+        if (expertInfo == null){
+            throw new BusinessException(ResponseCodeEnum.CODE_601);
+        }
+        if (!expertInfo.getExpertPassword().equals(StringTools.getMd5(expertPassword))) {
+            throw new BusinessException(ResponseCodeEnum.CODE_602);
+        }
+        String token = StringTools.getMd5(expertInfo.getExpertId()+StringTools.getRandomNumber(Constant.LENGTH_20));
+        redisComponent.saveUserLoginToken(token,expertInfo.getExpertId());
+    }
+
+    @Override
+    public void updateExpertInfo(ExpertInfo expertInfo) {
+        String expertId = redisComponent.getExpertIdByToken(request.getHeader(Constant.TOKEN_HEADER_KEY));
+        if (!expertId.equals(expertInfo.getExpertId())){
+            throw new BusinessException(ResponseCodeEnum.CODE_603);
+        }
+        expertInfoMapper.updateExpertInfo(expertInfo);
+    }
+}

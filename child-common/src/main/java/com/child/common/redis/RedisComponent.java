@@ -1,6 +1,7 @@
 package com.child.common.redis;
 
 import com.child.common.constants.Constant;
+import com.child.common.entity.po.User;
 import com.child.common.utils.TokenTools;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,15 @@ public class RedisComponent {
         String redisKey = Constant.REDIS_TOKEN_KEY+token;
         String phoneNumber = redisUtils.get(redisKey);
         return phoneNumber;
+    }
+
+    public String getExpertIdByToken(String token){
+        if (token == null || token.isEmpty()){
+            return null;
+        }
+        String redisKey = Constant.REDIS_TOKEN_KEY+token;
+        String expertId = redisUtils.get(redisKey);
+        return expertId;
     }
 
     public String refreshToken(String phoneNumber){
