@@ -1,14 +1,16 @@
 package com.parent.service.controller;
 
 import com.child.common.annotation.GlobalInterceptor;
+import com.child.common.constants.Constant;
+import com.child.common.entity.po.Member;
 import com.child.common.entity.po.User;
-import com.child.common.entity.vo.CheckCodeVO;
 import com.child.common.redis.RedisComponent;
 import com.child.common.result.R;
 import com.child.common.vo.UserLoginVO;
+import com.github.pagehelper.PageInfo;
 import com.parent.service.service.UserService;
-import com.wf.captcha.ArithmeticCaptcha;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
@@ -26,23 +28,26 @@ public class UserInfoController {
     private UserService userService;
     @Resource
     private RedisComponent redisComponent;
+    @Resource
+    private HttpServletRequest request;
 
 
     @RequestMapping("/login")
-    public R login( @NotEmpty String phoneNumber, @NotEmpty String password){
-        userService.login(phoneNumber, password);
-        return R.success();
+    public R<String> login(@NotEmpty String phoneNumber, @NotEmpty String password){
+        String token =  userService.login(phoneNumber, password);
+        return R.success(token);
     }
 
     @RequestMapping("/register")
-    public R<UserLoginVO> register(@NotEmpty String phoneNumber, @NotEmpty String password, @NotNull Integer role){
-        userService.register(phoneNumber, password,role);
+    public R<UserLoginVO> register(@NotEmpty String phoneNumber, @NotEmpty String password){
+        userService.register(phoneNumber, password);
         return R.success();
     }
 
     @RequestMapping("/createFamily")
     @GlobalInterceptor(checkLogin = true)
-    public R createFamily(@NotEmpty String userId,@NotEmpty String familyName,@NotEmpty String seniority){
+    public R createFamily(@NotEmpty String familyName,@NotEmpty String seniority){
+        String userId = redisComponent.getUserIdByToken(request.getHeader(Constant.TOKEN_HEADER_KEY));
         userService.createFamily(userId,familyName,seniority);
         return R.success();
     }
@@ -60,6 +65,20 @@ public class UserInfoController {
         return R.success();
     }
 
+    @RequestMapping("/getUserInfo")
+    @GlobalInterceptor(checkLogin = true)
+    public R<User> getUserInfo(){
+        String token = request.getHeader(Constant.TOKEN_HEADER_KEY);
+        String userId = redisComponent.getUserIdByToken(token);
+        return R.success(userService.getUserInfo(userId));
+    }
 
+    @RequestMapping("/searchMemberList")
+    @GlobalInterceptor(checkLogin = true)
+    public R<PageInfo<Member>> searchMemberList(Integer pageNum){
+        String token = request.getHeader(Constant.TOKEN_HEADER_KEY);
+        String userId = redisComponent.getUserIdByToken(token);
+        return R.success(userService.searchMemberList(userId,pageNum));
+    }
 
 }

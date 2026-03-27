@@ -8,7 +8,6 @@ public class User {
     private Integer age;
     private Integer sex;
     private Integer haveFamily;
-    private Integer role;
     private String address;
     private String mail;
 
@@ -28,13 +27,6 @@ public class User {
         this.mail = mail;
     }
 
-    public Integer getRole() {
-        return role;
-    }
-
-    public void setRole(Integer role) {
-        this.role = role;
-    }
 
     public Integer getAge() {
         return age;

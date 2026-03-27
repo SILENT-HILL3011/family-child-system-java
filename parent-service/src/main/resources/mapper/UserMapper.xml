@@ -16,7 +16,7 @@
 
     <!-- 根据ID查询用户 -->
     <select id="selectById" parameterType="java.lang.String" resultMap="UserResultMap">
-        SELECT user_id, phone_number, password, user_name, age, sex, have_family
+        SELECT user_id, phone_number, password, user_name, age, sex, have_family,mail,address
         FROM user_info
         WHERE user_id = #{userId}
     </select>

@@ -36,10 +36,10 @@ public class GlobalOperationAspect {
             token = request.getParameter(Constant.TOKEN_HEADER_KEY);
         }
         if (token == null || token.isEmpty()){
-            throw new BusinessException(ResponseCodeEnum.CODE_401);
+            throw new BusinessException("请先登录");
         }
-        String phoneNumber = redisComponent.getPhoneNumberByToken(token);
-        if (phoneNumber == null || phoneNumber.isEmpty()){
+        String userId = redisComponent.getUserIdByToken(token);
+        if (userId == null || userId.isEmpty()){
             throw new BusinessException(ResponseCodeEnum.CODE_401);
         }
     }

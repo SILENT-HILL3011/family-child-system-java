@@ -21,14 +21,6 @@ public class RedisComponent {
         return token;
     }
 
-    public String getPhoneNumberByToken(String token){
-        if (token == null || token.isEmpty()){
-            return null;
-        }
-        String redisKey = Constant.REDIS_TOKEN_KEY+token;
-        String phoneNumber = redisUtils.get(redisKey);
-        return phoneNumber;
-    }
 
     public String getExpertIdByToken(String token){
         if (token == null || token.isEmpty()){
@@ -37,6 +29,15 @@ public class RedisComponent {
         String redisKey = Constant.REDIS_TOKEN_KEY+token;
         String expertId = redisUtils.get(redisKey);
         return expertId;
+    }
+
+    public String getUserIdByToken(String token){
+        if (token == null || token.isEmpty()){
+            return null;
+        }
+        String redisKey = Constant.REDIS_TOKEN_KEY+token;
+        String userId = redisUtils.get(redisKey);
+        return userId;
     }
 
     public String refreshToken(String phoneNumber){
@@ -49,5 +50,6 @@ public class RedisComponent {
         String redisToken = redisUtils.get(Constant.REDIS_TOKEN_KEY+phoneNumber);
         return redisToken != null && redisToken.equals(token);
     }
+
 
 }

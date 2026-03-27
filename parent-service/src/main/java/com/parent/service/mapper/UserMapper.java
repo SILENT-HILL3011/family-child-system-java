@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-
+import java.util.List;
 
 
 public interface UserMapper {
@@ -16,7 +16,7 @@ public interface UserMapper {
     User selectByPhoneNumber(String phoneNumber);
 
 
-    @Update("insert into user_info(user_id, phone_number,password,role,have_family) values(#{userId},#{phoneNumber},#{password},#{role},#{haveFamily})")
+    @Update("insert into user_info(user_id, phone_number,password,have_family) values(#{userId},#{phoneNumber},#{password},#{haveFamily})")
     void insert(User user);
 
     User selectById(String id);
@@ -30,7 +30,7 @@ public interface UserMapper {
     void insertFamily(Family family);
 
 
-    @Insert("insert into member_info(member_id, family_id, member_name,seniority,role,phone) values(#{memberId},#{familyId},#{memberName},#{seniority},#{role},#{phone})")
+    @Insert("insert into member_info(member_id, family_id, member_name,seniority,phone,role) values(#{memberId},#{familyId},#{memberName},#{seniority},#{phone},#{role})")
     void insertMember(Member member);
 
     @Update("update user_info set have_family = 1 where user_id = #{userId}")
@@ -39,5 +39,6 @@ public interface UserMapper {
     @Select("select * from member_info where member_id = #{memberId}")
     Member selectFamilyByMemberId(String memberId);
 
-
+    @Select("select * from member_info where family_id = (select family_id from member_info where member_id = #{userId})")
+    List<Member> selectMemberList(String userId);
 }

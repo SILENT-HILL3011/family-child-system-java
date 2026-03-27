@@ -11,10 +11,17 @@ import com.child.common.exception.BusinessException;
 import com.child.common.redis.RedisComponent;
 import com.child.common.utils.StringTools;
 import com.child.common.vo.UserLoginVO;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.parent.service.mapper.UserMapper;
 import com.parent.service.service.UserService;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -23,9 +30,11 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
     @Resource
     private RedisComponent redisComponent;
+    @Resource
+    private HttpServletRequest request;
 
     @Override
-    public void register(String phoneNumber, String password,Integer role) {
+    public void register(String phoneNumber, String password) {
         User checkIsExist = userMapper.selectByPhoneNumber(phoneNumber);
         if (checkIsExist != null) {
             throw new BusinessException(ResponseCodeEnum.CODE_600);
@@ -34,30 +43,30 @@ public class UserServiceImpl implements UserService {
         user.setUserId(StringTools.getRandomNumber(Constant.LENGTH_12));
         user.setPhoneNumber(phoneNumber);
         user.setPassword(StringTools.getMd5(password));
-        user.setRole(role);
         user.setHaveFamily(HaveFamilyEnum.NO.getValue());
         userMapper.insert(user);
     }
 
     @Override
-    public UserLoginVO login(String phoneNumber, String password) {
+    public String login(String phoneNumber, String password) {
         User checkIsExist = userMapper.selectByPhoneNumber(phoneNumber);
         if (checkIsExist == null || !StringTools.getMd5(password).equals(checkIsExist.getPassword())){
             throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
         String token = StringTools.getMd5(checkIsExist.getUserId()+StringTools.getRandomNumber(Constant.LENGTH_20));
-        redisComponent.saveUserLoginToken(token,phoneNumber);
-        UserLoginVO userLoginVO = new UserLoginVO();
-        userLoginVO.setUserId(checkIsExist.getUserId());
-        userLoginVO.setPhoneNumber(phoneNumber);
-        userLoginVO.setPassword(password);
-        return userLoginVO;
+        redisComponent.saveUserLoginToken(token,checkIsExist.getUserId());
+        return token;
     }
 
     @Override
+    @Transactional
     public void createFamily(String userId,String familyName,String seniority) {
         Family checkIsExist = userMapper.selectFamilyById(userId);
         if (checkIsExist != null){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        User user = userMapper.selectById(userId);
+        if (user.getHaveFamily() == 1){
             throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
         Family family = new Family();
@@ -66,8 +75,9 @@ public class UserServiceImpl implements UserService {
         family.setFamilyName(familyName);
         userMapper.insertFamily(family);
         userMapper.updateUserFamily(userId);
-        User user = userMapper.selectById(userId);
         addMember(userId,family.getFamilyId(),user.getUserName(),seniority, MemberRoleEnum.MAIN.getCode(),user.getPhoneNumber());
+        user.setHaveFamily(Constant.IS);
+        userMapper.updateUserInfo(user);
     }
 
     @Override
@@ -78,6 +88,15 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(ResponseCodeEnum.CODE_600); // 或其他适当的错误码
         }
         addMember(user.getUserId(),familyId,user.getUserName(),seniority, role,user.getPhoneNumber());
+    }
+
+    @Override
+    public User getUserInfo(String userId) {
+        User user = userMapper.selectById(userId);
+        if (user == null){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        return user;
     }
 
     @Override
@@ -110,7 +129,17 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
-    private void addMember(String memberId,String familyId,String memberName,String seniority,Integer role,String phone){
+    @Override
+    public PageInfo<Member> searchMemberList(String userId,Integer pageNum) {
+        if (pageNum == null){
+            pageNum = Constant.NUM_ONE;
+        }
+        List<Member> memberList = userMapper.selectMemberList(userId);
+        PageHelper.startPage(pageNum, 10);
+        return PageInfo.of(memberList);
+    }
+
+    private void addMember(String memberId, String familyId, String memberName, String seniority, Integer role, String phone){
         Member member = new Member();
         member.setMemberId(memberId);
         member.setFamilyId(familyId);
