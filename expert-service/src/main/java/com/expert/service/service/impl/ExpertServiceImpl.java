@@ -1,11 +1,14 @@
 package com.expert.service.service.impl;
 
 import com.child.common.constants.Constant;
+import com.child.common.entity.po.Examination;
 import com.child.common.entity.po.ExpertInfo;
 import com.child.common.entity.vo.ResponseCodeEnum;
 import com.child.common.exception.BusinessException;
 import com.child.common.redis.RedisComponent;
+import com.child.common.utils.DateUtils;
 import com.child.common.utils.StringTools;
+import com.expert.service.entity.po.doctor.DoctorInfo;
 import com.expert.service.mapper.ExpertInfoMapper;
 import com.expert.service.service.ExpertService;
 import jakarta.annotation.Resource;
@@ -37,7 +40,7 @@ public class ExpertServiceImpl implements ExpertService {
     }
 
     @Override
-    public void login(String expertPhone, String expertPassword) {
+    public String login(String expertPhone, String expertPassword) {
         ExpertInfo expertInfo = expertInfoMapper.selectByPhoneNumber(expertPhone);
         if (expertInfo == null){
             throw new BusinessException(ResponseCodeEnum.CODE_601);
@@ -47,6 +50,7 @@ public class ExpertServiceImpl implements ExpertService {
         }
         String token = StringTools.getMd5(expertInfo.getExpertId()+StringTools.getRandomNumber(Constant.LENGTH_20));
         redisComponent.saveUserLoginToken(token,expertInfo.getExpertId());
+        return token;
     }
 
     @Override
@@ -56,5 +60,21 @@ public class ExpertServiceImpl implements ExpertService {
             throw new BusinessException(ResponseCodeEnum.CODE_603);
         }
         expertInfoMapper.updateExpertInfo(expertInfo);
+    }
+
+    @Override
+    public void createPersonalExamination(String expertId, String examinationTime) {
+        ExpertInfo expertInfo = expertInfoMapper.selectById(expertId);
+        if (expertInfo == null){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        if (!DateUtils.isValidDate(examinationTime)){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        Examination examination = new Examination();
+        examination.setExaminationId(StringTools.getRandomNumber(Constant.LENGTH_12));
+        examination.setDoctorId(expertId);
+        examination.setExaminationTime(DateUtils.ChangeStr2Date(examinationTime));
+        expertInfoMapper.insertExamination(examination);
     }
 }

@@ -1,22 +1,32 @@
 package com.parent.service.service.impl;
 
+import com.alibaba.excel.EasyExcel;
 import com.child.common.constants.Constant;
 import com.child.common.entity.enums.ChildVaccineEnum;
 import com.child.common.entity.enums.TimePerEnum;
 import com.child.common.entity.po.*;
+import com.child.common.entity.vo.ChildInfoVO;
 import com.child.common.entity.vo.GrowthConditionVO;
 import com.child.common.entity.vo.ResponseCodeEnum;
 import com.child.common.exception.BusinessException;
 import com.child.common.utils.ChildVaccineUtil;
 import com.child.common.utils.StringTools;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.parent.service.mapper.ChildMapper;
 import com.parent.service.mapper.DailyTimeMapper;
 import com.parent.service.mapper.UserMapper;
 import com.parent.service.mapper.VaccineRecordMapper;
 import com.parent.service.service.ChildService;
 import jakarta.annotation.Resource;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,6 +41,8 @@ public class ChildServiceImpl implements ChildService {
     private VaccineRecordMapper vaccineRecordMapper;
     @Resource
     private DailyTimeMapper dailyTimeMapper;
+    @Value("${file.upload-path}")
+    private String uploadPath;
 
     @Override
     public void addChild(String familyId, String childName, Integer sex,String idNumber) {
@@ -207,12 +219,61 @@ public class ChildServiceImpl implements ChildService {
     }
 
     @Override
-    public List<DailyTime> searchLive(String childId) {
-        List<DailyTime> dailyTimeListOfWeek = dailyTimeMapper.selectWeeklyRecordsByChildId(childId);
-        if (dailyTimeListOfWeek == null){
-            return new ArrayList<>();
+    public PageInfo<DailyTime> searchLive(String childId,Integer pageNum) {
+        if (pageNum == null){
+            pageNum = Constant.NUM_ONE;
         }
-        return dailyTimeListOfWeek;
+        List<DailyTime> dailyTimeListOfWeek = dailyTimeMapper.selectWeeklyRecordsByChildId(childId);
+        PageHelper.startPage(pageNum, 10);
+        return new PageInfo<>(dailyTimeListOfWeek);
+    }
+
+    @Override
+    public PageInfo<ChildInfoVO> searchChildInfo(String familyId, Integer pageNum) {
+        if (pageNum == null){
+            pageNum = Constant.NUM_ONE;
+        }
+        List<ChildInfoVO> childInfoVOList = childMapper.selectChildInfo(familyId);
+        PageHelper.startPage(pageNum, 10);
+        return new PageInfo<>(childInfoVOList);
+    }
+
+    @Override
+    public Child searchChildById(String childId) {
+        Child child = childMapper.selectById(childId);
+        if (child == null){
+            throw new BusinessException(ResponseCodeEnum.CODE_602);
+        }
+        return child;
+    }
+
+    @Override
+    public void exportLive(String childId, HttpServletResponse response)throws Exception {
+        PageInfo<DailyTime> pageInfo = searchLive(childId, 9999);
+        List<DailyTime> dataList = pageInfo.getList();
+
+        // 2. 转换为 Excel 实体
+        List<DailyTimeExcel> excelList = new ArrayList<>();
+        for (DailyTime d : dataList) {
+            DailyTimeExcel e = new DailyTimeExcel();
+            e.setTime(d.getTime());
+            e.setFood(d.getFood());
+            e.setSleepTime(d.getSleepTime());
+            e.setRecordTime(d.getRecordTime() == null ? "" : d.getRecordTime().toString());
+            excelList.add(e);
+        }
+
+        // ====================== 核心：正确响应头 ======================
+        response.reset(); // 清空所有之前的响应
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("UTF-8");
+        String fileName = URLEncoder.encode("生活记录", "UTF-8");
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
+
+        // 3. 写出 Excel
+        EasyExcel.write(response.getOutputStream(), DailyTimeExcel.class)
+                .sheet("生活记录")
+                .doWrite(excelList);
     }
 
     private int getValue(Integer num) {

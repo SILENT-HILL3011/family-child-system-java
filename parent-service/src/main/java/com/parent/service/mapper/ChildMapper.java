@@ -3,10 +3,12 @@ package com.parent.service.mapper;
 import com.child.common.entity.po.Child;
 import com.child.common.entity.po.Examination;
 import com.child.common.entity.po.VaccineRecord;
+import com.child.common.entity.vo.ChildInfoVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.Date;
+import java.util.List;
 
 public interface ChildMapper {
     @Select("select * from child_info where child_name = #{childName} and family_id = #{familyId}")
@@ -36,4 +38,7 @@ public interface ChildMapper {
 
     @Insert("insert into personal_examination_record(child_id,ischecked,doctor_id,examination_id,appointment_time) values(#{childId},#{isChecked},#{doctorId},#{examinationId},#{examinationTime})")
     void updateExamination(Examination examination);
+
+    @Select("select family_id,child_id,child_name,sex,age,idnumber from child_info where family_id = #{familyId}")
+    List<ChildInfoVO> selectChildInfo(String familyId);
 }

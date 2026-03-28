@@ -25,9 +25,5 @@ public class DoctorController {
         return R.success();
     }
 
-    @RequestMapping("/createPersonalExamination")
-    public R createPersonalExamination(@NotEmpty String doctorId,@NotEmpty String examinationTime){
-        doctorService.createPersonalExamination(doctorId,examinationTime);
-        return R.success();
-    }
+
 }

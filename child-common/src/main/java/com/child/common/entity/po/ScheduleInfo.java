@@ -1,11 +1,23 @@
 package com.child.common.entity.po;
 
-public class ScheduleInfo {
+import java.io.Serializable;
+import java.util.Date;
+
+public class ScheduleInfo implements Serializable {
 
     private String userId;
-    private Integer date;
+    private Date date;
     private Integer importance;
     private Integer form;
+    private String work;
+
+    public String getWork() {
+        return work;
+    }
+
+    public void setWork(String work) {
+        this.work = work;
+    }
 
     public String getUserId() {
         return userId;
@@ -15,11 +27,11 @@ public class ScheduleInfo {
         this.userId = userId;
     }
 
-    public Integer getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(Integer date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

@@ -5,12 +5,15 @@ import com.child.common.entity.po.Child;
 import com.child.common.entity.po.DailyTime;
 import com.child.common.entity.po.Examination;
 import com.child.common.entity.po.VaccineRecord;
+import com.child.common.entity.vo.ChildInfoVO;
 import com.child.common.entity.vo.GrowthConditionVO;
 import com.child.common.entity.vo.ResponseCodeEnum;
 import com.child.common.exception.BusinessException;
 import com.child.common.result.R;
+import com.github.pagehelper.PageInfo;
 import com.parent.service.service.ChildService;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
@@ -34,6 +37,20 @@ public class GrowController {
         childService.addChild(familyId,childName,sex,idNumber);
         return R.success();
     }
+
+    @RequestMapping("/searchChildInfo")
+    @GlobalInterceptor(checkLogin = true)
+    public R<PageInfo<ChildInfoVO>> searchChildInfo(@NotEmpty String familyId, Integer pageNum){
+        return R.success(childService.searchChildInfo(familyId,pageNum));
+    }
+
+    @RequestMapping("/searchChildById")
+    @GlobalInterceptor(checkLogin = true)
+    public R<Child> searchChildById(@NotEmpty String childId){
+        Child child = childService.searchChildById(childId);
+        return R.success(child);
+    }
+
     @RequestMapping("/updateChildInfo")
     @GlobalInterceptor(checkLogin = true)
     public R updateChildInfo(@RequestBody Child child){
@@ -48,30 +65,35 @@ public class GrowController {
     }
 
     @RequestMapping("/searchVaccine")
+    @GlobalInterceptor(checkLogin = true)
     public R<VaccineRecord> searchVaccine(@NotEmpty String childId){
         VaccineRecord vaccineRecord = childService.searchVaccine(childId);
         return R.success(vaccineRecord);
     }
 
     @RequestMapping("/updateVaccine")
+    @GlobalInterceptor(checkLogin = true)
     public R updateVaccine(@NotEmpty String childId,@NotEmpty String vaccine){
         childService.updateVaccine(childId,vaccine);
         return R.success();
     }
 
     @RequestMapping("/searchVaccineThisYear")
+    @GlobalInterceptor(checkLogin = true)
     public R<List<String>> searchVaccineThisYear(@NotEmpty String childId){
         List<String> notDoneVaccine = childService.searchVaccineThisYear(childId);
         return R.success(notDoneVaccine);
     }
 
     @RequestMapping("/appointExamination")
+    @GlobalInterceptor(checkLogin = true)
     public R<Examination> appointExamination(@NotEmpty String childId,@NotEmpty String doctorId){
         Examination examination = childService.appointExamination(childId,doctorId);
         return R.success(examination);
     }
 
     @RequestMapping("/recordLive")
+    @GlobalInterceptor(checkLogin = true)
     public R recordLive(@NotEmpty String childId,@NotNull Integer time,String food,Integer sleepTime){
         if (time == 1 || time == 2 || time == 4){
             childService.recordFood(childId,time,food);
@@ -84,9 +106,16 @@ public class GrowController {
     }
 
     @RequestMapping("/searchLive")
-    public R<List<DailyTime>> searchLive(@NotEmpty String childId){
-        List<DailyTime> dailyTimes = childService.searchLive(childId);
-        return R.success(dailyTimes);
+    @GlobalInterceptor(checkLogin = true)
+    public R<PageInfo<DailyTime>> searchLive(@NotEmpty String childId,Integer pageNum){
+        return R.success(childService.searchLive(childId,pageNum));
+    }
+
+    @RequestMapping("/exportLive")
+//    @GlobalInterceptor(checkLogin = true)
+    public void exportLive(@NotEmpty String childId, HttpServletResponse  response)throws Exception{
+        System.out.println("后端收到的 childId：" + childId);
+        childService.exportLive(childId, response);
     }
 
 }
