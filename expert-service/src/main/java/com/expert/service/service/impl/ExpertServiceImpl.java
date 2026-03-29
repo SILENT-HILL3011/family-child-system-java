@@ -3,6 +3,7 @@ package com.expert.service.service.impl;
 import com.child.common.constants.Constant;
 import com.child.common.entity.po.Examination;
 import com.child.common.entity.po.ExpertInfo;
+import com.child.common.entity.po.MainBox;
 import com.child.common.entity.vo.ResponseCodeEnum;
 import com.child.common.exception.BusinessException;
 import com.child.common.redis.RedisComponent;
@@ -14,6 +15,8 @@ import com.expert.service.service.ExpertService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Service
 public class ExpertServiceImpl implements ExpertService {
@@ -76,5 +79,22 @@ public class ExpertServiceImpl implements ExpertService {
         examination.setDoctorId(expertId);
         examination.setExaminationTime(DateUtils.ChangeStr2Date(examinationTime));
         expertInfoMapper.insertExamination(examination);
+        MainBox mainBox = new MainBox();
+        mainBox.setId(StringTools.getRandomNumber(Constant.LENGTH_12));
+        mainBox.setSendUserId(expertId);
+        mainBox.setTitle("体检通知");
+        mainBox.setContent("您有一份体检结果，请及时查看");
+        mainBox.setCreateTime(new Date());
+        mainBox.setIsRead(Constant.NO);
+        expertInfoMapper.insertMailOfExamination(mainBox);
+    }
+
+    @Override
+    public ExpertInfo searchExpertInfo(String expertId) {
+        ExpertInfo expertInfo = expertInfoMapper.selectById(expertId);
+        if (expertInfo == null){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        return expertInfo;
     }
 }

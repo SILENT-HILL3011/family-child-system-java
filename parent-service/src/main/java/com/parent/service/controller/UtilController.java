@@ -1,10 +1,13 @@
 package com.parent.service.controller;
 
+import com.child.common.annotation.GlobalInterceptor;
 import com.child.common.constants.Constant;
 import com.child.common.entity.po.ExpertInfo;
 import com.child.common.entity.po.MessageBoard;
 import com.child.common.entity.po.MessageBoardExpert;
 import com.child.common.entity.po.UtilInfo;
+import com.child.common.entity.vo.MessageInfoVO;
+import com.child.common.redis.RedisComponent;
 import com.child.common.result.R;
 import com.github.pagehelper.PageInfo;
 import com.parent.service.service.UtilService;
@@ -12,6 +15,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +31,8 @@ public class UtilController {
     private UtilService utilService;
     @Resource
     private HttpServletRequest request;
+    @Resource
+    private RedisComponent redisComponent;
 
     @RequestMapping("/getList")
     public R<List<String>> getUtilList(@NotNull Integer type){
@@ -44,6 +50,7 @@ public class UtilController {
     // TODO 育儿知识
 
     @RequestMapping("/getExpertByType")
+    @GlobalInterceptor(checkLogin = true)
     public R<PageInfo<ExpertInfo>> getExpertByType(@NotNull Integer type, Integer pageNum){
         return R.success(utilService.getExpertByType(type, pageNum));
     }
@@ -52,15 +59,23 @@ public class UtilController {
 
     @RequestMapping("/consultToExpert")
     public R<String> consultToExpert(@NotEmpty String expertId,@NotEmpty String message,String boardId){
-//        String userId = request.getHeader(Constant.TOKEN_HEADER_KEY);
-        String userId = "911168719308";
-        utilService.consultToExpert(userId,expertId,message,boardId);
-        return R.success("咨询成功");
+        String token = request.getHeader(Constant.TOKEN_HEADER_KEY);
+        String userId = redisComponent.getUserIdByToken(token);
+        String id =  utilService.consultToExpert(userId,expertId,message,boardId);
+        return R.success(id);
     }
 
     @RequestMapping("/searchMyMessage")
-    public R<PageInfo<MessageBoardExpert>> searchMyMessage(@NotEmpty String userId, Integer pageNum){
+    public R<PageInfo<MessageBoardExpert>> searchMyMessage(Integer pageNum){
+        String token = request.getHeader(Constant.TOKEN_HEADER_KEY);
+        String userId = redisComponent.getUserIdByToken(token);
         return R.success(utilService.searchMyMessage(userId,pageNum));
+    }
+
+    @RequestMapping("/getMessageInfoByBoardId")
+    public R getMessageInfoByBoardId(@NotEmpty String boardId) {
+        List<MessageInfoVO> list = utilService.selectMessageInfoByBoardId(boardId);
+        return R.success(list);
     }
 
     @RequestMapping("/finishMessage")

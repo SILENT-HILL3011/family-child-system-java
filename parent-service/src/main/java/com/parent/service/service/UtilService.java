@@ -4,6 +4,7 @@ import com.child.common.entity.po.ExpertInfo;
 import com.child.common.entity.po.MessageBoard;
 import com.child.common.entity.po.MessageBoardExpert;
 import com.child.common.entity.po.UtilInfo;
+import com.child.common.entity.vo.MessageInfoVO;
 import com.github.pagehelper.PageInfo;
 
 import java.util.List;
@@ -16,9 +17,12 @@ public interface UtilService {
 
     PageInfo<ExpertInfo> getExpertByType(Integer type, Integer pageNum);
 
-    void consultToExpert(String userId, String expertId, String message,String boardId);
+//    void consultToExpert(String userId, String expertId, String message,String boardId);
+    String consultToExpert(String userId, String expertId, String message,String boardId);
 
     PageInfo<MessageBoardExpert> searchMyMessage(String userId, Integer pageNum);
 
     void finishMessage(String boardId);
+
+    List<MessageInfoVO> selectMessageInfoByBoardId(String boardId);
 }

@@ -2,6 +2,7 @@ package com.expert.service.mapper;
 
 import com.child.common.entity.po.Examination;
 import com.child.common.entity.po.ExpertInfo;
+import com.child.common.entity.po.MainBox;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 
@@ -21,4 +22,7 @@ public interface ExpertInfoMapper {
 
     @Insert("insert into personal_examination_record(examination_id,doctor_id,appointment_time) values(#{examinationId},#{doctorId},#{examinationTime})")
     void insertExamination(Examination examination);
+
+    @Insert("insert into sys_message (id,send_user_id,title,content,create_time,is_read) values (#{id},#{sendUserId},#{title},#{content},#{createTime},#{isRead})")
+    void insertMailOfExamination(MainBox mainBox);
 }

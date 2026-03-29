@@ -12,4 +12,6 @@ public interface ExpertService {
     void updateExpertInfo(ExpertInfo expertInfo);
 
     void createPersonalExamination(String expertId, String examinationTime);
+
+    ExpertInfo searchExpertInfo(String expertId);
 }

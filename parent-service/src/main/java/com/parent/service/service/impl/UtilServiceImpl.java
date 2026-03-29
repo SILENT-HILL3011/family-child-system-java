@@ -3,6 +3,7 @@ package com.parent.service.service.impl;
 import com.child.common.constants.Constant;
 import com.child.common.entity.enums.ExpertTypeEnum;
 import com.child.common.entity.po.*;
+import com.child.common.entity.vo.MessageInfoVO;
 import com.child.common.utils.StringTools;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -54,30 +55,68 @@ public class UtilServiceImpl implements UtilService {
         return PageInfo.of(expertInfoList);
     }
 
+//    @Override
+//    public void consultToExpert(String userId, String expertId, String message,String boardId) {
+//        MessageBoardExpert messageBoardExpert;
+//        if (boardId != null){
+//            messageBoardExpert = utilMapper.selectBoardExpertByBoardId(boardId);
+//            messageBoardExpert.setMessageCount(messageBoardExpert.getMessageCount()+1);
+//        }else {
+//            messageBoardExpert = new MessageBoardExpert();
+//            messageBoardExpert.setBoardId(StringTools.getRandomNumber(Constant.LENGTH_12));
+//            messageBoardExpert.setExpertId(expertId);
+//            messageBoardExpert.setUserId(userId);
+//            messageBoardExpert.setIsFinished(Constant.NO);
+//            messageBoardExpert.setMessageCount(Constant.NUM_ZERO);
+//        }
+//        messageBoardExpertMapper.insertMessageBoardExpert(messageBoardExpert);
+//        MessageInfo messageInfo = new MessageInfo();
+//        messageInfo.setMessageId(StringTools.getRandomNumber(Constant.LENGTH_12));
+//        messageInfo.setBoardId(messageBoardExpert.getBoardId());
+//        messageInfo.setText(message);
+//        messageInfo.setPublisherId(userId);
+//        messageInfo.setPublishDate(new Date());
+//        messageBoardExpert.setMessageCount(messageBoardExpert.getMessageCount()+1);
+//        messageBoardExpertMapper.updateMessageBoardExpert(messageBoardExpert);
+//        utilMapper.insertMessageInfo(messageInfo);
+//    }
+
     @Override
-    public void consultToExpert(String userId, String expertId, String message,String boardId) {
-        MessageBoardExpert messageBoardExpert;
-        if (boardId != null){
+    public String consultToExpert(String userId, String expertId, String message, String boardId) {
+        MessageBoardExpert messageBoardExpert = null;
+
+        // 1. 有 boardId → 查询旧会话
+        if (boardId != null && !boardId.isEmpty()) {
             messageBoardExpert = utilMapper.selectBoardExpertByBoardId(boardId);
-            messageBoardExpert.setMessageCount(messageBoardExpert.getMessageCount()+1);
-        }else {
+        }
+
+        // 2. 没有会话 → 新建（第一次发送 / 找不到旧会话）
+        if (messageBoardExpert == null) {
             messageBoardExpert = new MessageBoardExpert();
             messageBoardExpert.setBoardId(StringTools.getRandomNumber(Constant.LENGTH_12));
             messageBoardExpert.setExpertId(expertId);
             messageBoardExpert.setUserId(userId);
             messageBoardExpert.setIsFinished(Constant.NO);
-            messageBoardExpert.setMessageCount(Constant.NUM_ZERO);
+            messageBoardExpert.setMessageCount(0);
+            // ✅ 新会话：插入
+            messageBoardExpertMapper.insertMessageBoardExpert(messageBoardExpert);
         }
-        messageBoardExpertMapper.insertMessageBoardExpert(messageBoardExpert);
+
+        // 3. 插入消息（一定会执行）
         MessageInfo messageInfo = new MessageInfo();
         messageInfo.setMessageId(StringTools.getRandomNumber(Constant.LENGTH_12));
         messageInfo.setBoardId(messageBoardExpert.getBoardId());
         messageInfo.setText(message);
         messageInfo.setPublisherId(userId);
         messageInfo.setPublishDate(new Date());
-        messageBoardExpert.setMessageCount(messageBoardExpert.getMessageCount()+1);
-        messageBoardExpertMapper.updateMessageBoardExpert(messageBoardExpert);
         utilMapper.insertMessageInfo(messageInfo);
+
+        // 4. 更新消息数量
+        messageBoardExpert.setMessageCount(messageBoardExpert.getMessageCount() + 1);
+        // ✅ 旧会话：更新
+        messageBoardExpertMapper.updateMessageBoardExpert(messageBoardExpert);
+
+        return messageBoardExpert.getBoardId();
     }
 
     @Override
@@ -95,5 +134,14 @@ public class UtilServiceImpl implements UtilService {
         MessageBoardExpert messageBoardExpert = utilMapper.selectBoardExpertByBoardId(boardId);
         messageBoardExpert.setIsFinished(Constant.IS);
         messageBoardExpertMapper.finish(messageBoardExpert);
+    }
+
+    @Override
+    public List<MessageInfoVO> selectMessageInfoByBoardId(String boardId) {
+        List<MessageInfoVO> messageInfoVOList = utilMapper.selectMessageInfoByBoardId(boardId);
+        if (messageInfoVOList == null) {
+            return null;
+        }
+        return messageInfoVOList;
     }
 }

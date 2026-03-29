@@ -1,5 +1,6 @@
 package com.expert.service.controller;
 
+import com.child.common.annotation.GlobalInterceptor;
 import com.child.common.constants.Constant;
 import com.child.common.entity.po.ExpertInfo;
 import com.child.common.redis.RedisComponent;
@@ -38,12 +39,23 @@ public class ExpertInfoController {
     }
 
     @RequestMapping("/updateExpertInfo")
+    @GlobalInterceptor(checkLogin = true)
     public R updateExpertInfo(@RequestBody ExpertInfo expertInfo){
         expertService.updateExpertInfo(expertInfo);
         return R.success();
     }
 
+    @RequestMapping("/searchExpertInfo")
+    @GlobalInterceptor(checkLogin = true)
+    public R<ExpertInfo> searchExpertInfo(){
+        String token = request.getHeader(Constant.TOKEN_HEADER_KEY);
+        String expertId = redisComponent.getExpertIdByToken(token);
+        ExpertInfo expertInfo = expertService.searchExpertInfo(expertId);
+        return R.success(expertInfo);
+    }
+
     @RequestMapping("/createPersonalExamination")
+    @GlobalInterceptor(checkLogin = true)
     public R createPersonalExamination(@NotEmpty String examinationTime){
         String token = request.getHeader(Constant.TOKEN_HEADER_KEY);
         String expertId = redisComponent.getExpertIdByToken(token);
