@@ -36,6 +36,7 @@ public class ScheduleDelayJob {
             mainBox.setUserId(info.getUserId());
             mainBox.setTitle(Constant.SCHEDULE_REMIND);
             mainBox.setContent(Constant.TOMORROW_SCHEDULE + info.getWork() + Constant.SCHEDULE_TIME + DateUtils.changeDate2Str(info.getDate()));
+            mainBox.setIsRead(Constant.NO);
             mailBoxMapper.insert(mainBox);
         }
     }

@@ -81,4 +81,12 @@ public class UserInfoController {
         return R.success(userService.searchMemberList(userId,pageNum));
     }
 
+    @RequestMapping("/getFamilyId")
+    @GlobalInterceptor(checkLogin = true)
+    public R<String> getFamilyId(){
+        String token = request.getHeader(Constant.TOKEN_HEADER_KEY);
+        String userId = redisComponent.getUserIdByToken(token);
+        return R.success(userService.getFamilyId(userId));
+    }
+
 }

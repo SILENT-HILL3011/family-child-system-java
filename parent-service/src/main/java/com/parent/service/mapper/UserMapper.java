@@ -41,4 +41,19 @@ public interface UserMapper {
 
     @Select("select * from member_info where family_id = (select family_id from member_info where member_id = #{userId})")
     List<Member> selectMemberList(String userId);
+
+    @Select("select member_name from member_info where member_id = #{publisherId}")
+    String selectMemberName(String publisherId);
+
+    @Select("select family_id from member_info where member_name = #{userName}")
+    String selectFamilyIdByName(String userName);
+
+    @Select("select * from member_info where phone = #{phone}")
+    Member selectMemberByPhone(String phone);
+
+    @Update("update member_info set role = #{role} where phone = #{phone}")
+    void updateRole(Member member);
+
+    @Select("select count(*) from member_info where family_id = #{familyId} and role = 1")
+    int countPrimaryByFamilyId(String familyId);
 }

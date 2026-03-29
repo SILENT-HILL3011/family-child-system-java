@@ -8,6 +8,7 @@ import com.child.common.utils.DateUtils;
 import com.child.common.utils.StringTools;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.parent.service.annotation.CheckPrimaryCaregiverLimit;
 import com.parent.service.mapper.MessageMapper;
 import com.parent.service.mapper.TaskMapper;
 import com.parent.service.mapper.UserMapper;
@@ -107,34 +108,28 @@ public class FamilyServiceImpl implements FamilyService {
     }
 
     @Override
-    public PageInfo<MessageBoardVO> searchMessageByPage(String familyId, String publisherId, Integer timePeriod,Integer pageNum) {
+    public List<MessageBoardVO> searchMessageByPage(String familyId, Integer timePeriod) {
         if (timePeriod == null){
             timePeriod = Constant.NUM_ONE;
         }
         if (timePeriod != 1 && timePeriod != 7 && timePeriod != 30) {
             throw new BusinessException("时间段错误");
         }
-        if (pageNum != null){
-            pageNum = Constant.NUM_ONE;
-        }
-        PageHelper.startPage(pageNum, 10);
-        Member member = userMapper.selectFamilyByMemberId(publisherId);
-        Family family = userMapper.selectFamilyById(familyId);
-        List<MessageBoard> messageBoards = messageMapper.selectMessage(familyId, publisherId, timePeriod);
+
+        List<MessageBoard> messageBoards = messageMapper.selectMessage(familyId, timePeriod);
         List<MessageBoardVO> messageBoardVOList = new ArrayList<>();
         for (MessageBoard messageBoard : messageBoards) {
             MessageBoardVO messageBoardVO = new MessageBoardVO();
             messageBoardVO.setMessageId(messageBoard.getMessageId());
-            messageBoardVO.setFamilyName(family.getFamilyName());
-            messageBoardVO.setPublisherName(member.getMemberName());
+            String memberName = userMapper.selectMemberName(messageBoard.getPublisherId());
+            messageBoardVO.setMemberName(memberName);
             messageBoardVO.setContent(messageBoard.getContent());
-            messageBoardVO.setImageUrl(messageBoard.getImageUrl());
             messageBoardVO.setPublishTime(messageBoard.getPublishTime());
             messageBoardVO.setLikeCount(messageBoard.getLikeCount());
             messageBoardVO.setCommentCount(messageBoard.getCommentCount());
             messageBoardVOList.add(messageBoardVO);
         }
-        return new PageInfo<>(messageBoardVOList);
+        return messageBoardVOList;
     }
 
     @Override
@@ -144,13 +139,9 @@ public class FamilyServiceImpl implements FamilyService {
             throw new BusinessException("消息不存在");
         }
         Member member = userMapper.selectFamilyByMemberId(likeMessageBoard.getPublisherId());
-        Family family = userMapper.selectFamilyById(likeMessageBoard.getFamilyId());
         MessageBoardVO likeMessageVO = new MessageBoardVO();
         likeMessageVO.setMessageId(likeMessageBoard.getMessageId());
-        likeMessageVO.setFamilyName(family.getFamilyName());
-        likeMessageVO.setPublisherName(member.getMemberName());
         likeMessageVO.setContent(likeMessageBoard.getContent());
-        likeMessageVO.setImageUrl(likeMessageBoard.getImageUrl());
         likeMessageVO.setPublishTime(likeMessageBoard.getPublishTime());
         likeMessageVO.setLikeCount(likeMessageBoard.getLikeCount() + 1);
         likeMessageVO.setCommentCount(likeMessageBoard.getCommentCount());
@@ -175,10 +166,7 @@ public class FamilyServiceImpl implements FamilyService {
         Family family = userMapper.selectFamilyById(likeMessageBoard.getFamilyId());
         MessageBoardVO applyMessageVO = new MessageBoardVO();
         applyMessageVO.setMessageId(likeMessageBoard.getMessageId());
-        applyMessageVO.setFamilyName(family.getFamilyName());
-        applyMessageVO.setPublisherName(member.getMemberName());
         applyMessageVO.setContent(likeMessageBoard.getContent());
-        applyMessageVO.setImageUrl(likeMessageBoard.getImageUrl());
         applyMessageVO.setPublishTime(likeMessageBoard.getPublishTime());
         applyMessageVO.setLikeCount(likeMessageBoard.getLikeCount());
         applyMessageVO.setCommentCount(likeMessageBoard.getCommentCount() + 1);
@@ -194,13 +182,18 @@ public class FamilyServiceImpl implements FamilyService {
     }
 
     @Override
-    public List<String> searchComment(String messageId) {
-        List<String> messageComments = messageMapper.selectComment(messageId);
-        return messageComments;
+    public List<MessageComment> searchComment(String messageId) {
+
+        List<MessageComment> messageCommentList = messageMapper.selectCommentByMessageId(messageId);
+        for (MessageComment messageComment : messageCommentList) {
+            Member member = userMapper.selectFamilyByMemberId(messageComment.getUserId());
+            messageComment.setContent(member.getMemberName() + ":" + messageComment.getContent());
+        }
+        return messageCommentList;
     }
 
     @Override
-    public void applyToComment(String commentId, String content) {
+    public String applyToComment(String commentId, String content) {
         MessageComment messageComment = messageMapper.selectMessageCommentById(commentId);
         if (messageComment == null){
             throw new BusinessException("评论不存在");
@@ -213,6 +206,25 @@ public class FamilyServiceImpl implements FamilyService {
         applyComment.setCommentTime(new Date());
         applyComment.setReplyToId(messageComment.getCommentId());
         messageMapper.insertMessageComment(applyComment);
+        messageMapper.updateCommentCount(messageComment.getMessageId());
+        return applyComment.getReplyToId();
+    }
+
+    @Override
+    public List<TaskInfo> searchMyTask(String userId) {
+        List<TaskInfo> taskInfoList = taskMapper.selectByReceiverId(userId);
+        if (taskInfoList == null){
+            return new ArrayList<>();
+        }
+        return taskInfoList;
+    }
+
+    @Override
+    @CheckPrimaryCaregiverLimit
+    public void changeRole(String phoneNumber, Integer role) {
+        Member member = userMapper.selectMemberByPhone(phoneNumber);
+        member.setRole(role);
+        userMapper.updateRole(member);
     }
 
     private List<MessageBoardVO> searchMessage(String familyId, String publisherId, Integer timePeriod) {
@@ -224,15 +236,12 @@ public class FamilyServiceImpl implements FamilyService {
         }
         Member member = userMapper.selectFamilyByMemberId(publisherId);
         Family family = userMapper.selectFamilyById(familyId);
-        List<MessageBoard> messageBoards = messageMapper.selectMessage(familyId, publisherId, timePeriod);
+        List<MessageBoard> messageBoards = messageMapper.selectMessage(familyId, timePeriod);
         List<MessageBoardVO> messageBoardVOList = new ArrayList<>();
         for (MessageBoard messageBoard : messageBoards) {
             MessageBoardVO messageBoardVO = new MessageBoardVO();
             messageBoardVO.setMessageId(messageBoard.getMessageId());
-            messageBoardVO.setFamilyName(family.getFamilyName());
-            messageBoardVO.setPublisherName(member.getMemberName());
             messageBoardVO.setContent(messageBoard.getContent());
-            messageBoardVO.setImageUrl(messageBoard.getImageUrl());
             messageBoardVO.setPublishTime(messageBoard.getPublishTime());
             messageBoardVO.setLikeCount(messageBoard.getLikeCount());
             messageBoardVO.setCommentCount(messageBoard.getCommentCount());
@@ -242,7 +251,7 @@ public class FamilyServiceImpl implements FamilyService {
     }
 
     @Scheduled(cron = "0 0 0 * * ?")
-    private void autoFinishExpiredTask(){
+    public void autoFinishExpiredTask(){
         List<TaskInfo> tasks = taskMapper.selectUnfinishedExpiredTasks();
         if (tasks.isEmpty()){
             return;

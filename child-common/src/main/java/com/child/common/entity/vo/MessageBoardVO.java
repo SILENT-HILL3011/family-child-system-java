@@ -5,10 +5,8 @@ import java.util.Date;
 public class MessageBoardVO {
 
     private String messageId;
-    private String familyName;
-    private String publisherName;
+    private String memberName;
     private String content;
-    private String imageUrl;
     private Date publishTime;
     private Integer likeCount;
     private Integer commentCount;
@@ -21,20 +19,12 @@ public class MessageBoardVO {
         this.messageId = messageId;
     }
 
-    public String getFamilyName() {
-        return familyName;
+    public String getMemberName() {
+        return memberName;
     }
 
-    public void setFamilyName(String familyName) {
-        this.familyName = familyName;
-    }
-
-    public String getPublisherName() {
-        return publisherName;
-    }
-
-    public void setPublisherName(String publisherName) {
-        this.publisherName = publisherName;
+    public void setMemberName(String memberName) {
+        this.memberName = memberName;
     }
 
     public String getContent() {
@@ -45,13 +35,6 @@ public class MessageBoardVO {
         this.content = content;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
 
     public Date getPublishTime() {
         return publishTime;

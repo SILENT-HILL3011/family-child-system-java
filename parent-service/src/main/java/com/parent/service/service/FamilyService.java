@@ -1,5 +1,6 @@
 package com.parent.service.service;
 
+import com.child.common.entity.po.MessageComment;
 import com.child.common.entity.po.TaskInfo;
 import com.child.common.entity.vo.MessageBoardVO;
 import com.github.pagehelper.PageInfo;
@@ -17,13 +18,18 @@ public interface FamilyService {
 
     void publishMessage(String publisherId, String content, String imageUrl);
 
-    PageInfo<MessageBoardVO> searchMessageByPage(String familyId, String publisherId, Integer timePeriod,Integer pageNum);
+    List<MessageBoardVO> searchMessageByPage(String familyId, Integer timePeriod);
 
     MessageBoardVO likeMessage(String messageId);
 
     MessageBoardVO applyToMessage(String messageId, String content);
 
-    List<String> searchComment(String messageId);
+    List<MessageComment> searchComment(String messageId);
 
-    void applyToComment(String commentId, String content);
+    String applyToComment(String commentId, String content);
+
+    List<TaskInfo> searchMyTask(String userId);
+
+
+    void changeRole(String phoneNumber, Integer role);
 }

@@ -29,6 +29,7 @@ public class DelayConsumer {
             msg.setTitle("【1小时后重要日程提醒】");
             msg.setContent("日程：" + schedule.getWork() + "，时间：" + DateUtils.changeDate2Str(schedule.getDate()));
             msg.setCreateTime(new Date());
+            msg.setIsRead(Constant.NO);
 
             mailBoxMapper.insert(msg);
         } catch (Exception e) {

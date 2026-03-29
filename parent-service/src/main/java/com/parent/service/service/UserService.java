@@ -21,4 +21,6 @@ public interface UserService {
      User getUserInfo(String userId);
 
     PageInfo<Member> searchMemberList(String userId,Integer pageNum);
+
+    String getFamilyId(String userId);
 }

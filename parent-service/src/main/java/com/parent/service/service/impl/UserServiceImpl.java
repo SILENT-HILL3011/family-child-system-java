@@ -10,10 +10,9 @@ import com.child.common.entity.vo.ResponseCodeEnum;
 import com.child.common.exception.BusinessException;
 import com.child.common.redis.RedisComponent;
 import com.child.common.utils.StringTools;
-import com.child.common.vo.UserLoginVO;
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.parent.service.annotation.CheckPrimaryCaregiverLimit;
 import com.parent.service.mapper.UserMapper;
 import com.parent.service.service.UserService;
 import jakarta.annotation.Resource;
@@ -55,6 +54,11 @@ public class UserServiceImpl implements UserService {
         }
         String token = StringTools.getMd5(checkIsExist.getUserId()+StringTools.getRandomNumber(Constant.LENGTH_20));
         redisComponent.saveUserLoginToken(token,checkIsExist.getUserId());
+        Member member = userMapper.selectMemberByPhone(phoneNumber);
+        if (member != null){
+            redisComponent.save(Constant.REDIS_ROLE_KEY + token,member.getRole().toString());
+            redisComponent.save(Constant.REDIS_FAMILY_KEY + token,member.getFamilyId());
+        }
         return token;
     }
 
@@ -81,6 +85,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CheckPrimaryCaregiverLimit
     public void inviteMember(String phoneNumber, String familyId,String seniority,Integer role) {
         User user = userMapper.selectByPhoneNumber(phoneNumber);
         String id = user.getUserId();
@@ -139,7 +144,18 @@ public class UserServiceImpl implements UserService {
         return PageInfo.of(memberList);
     }
 
-    private void addMember(String memberId, String familyId, String memberName, String seniority, Integer role, String phone){
+    @Override
+    public String getFamilyId(String userId) {
+        User user = userMapper.selectById(userId);
+        String userName = user.getUserName();
+        String familyId = userMapper.selectFamilyIdByName(userName);
+        if (familyId == null){
+            return null;
+        }
+        return familyId;
+    }
+
+    public void addMember(String memberId, String familyId, String memberName, String seniority, Integer role, String phone){
         Member member = new Member();
         member.setMemberId(memberId);
         member.setFamilyId(familyId);

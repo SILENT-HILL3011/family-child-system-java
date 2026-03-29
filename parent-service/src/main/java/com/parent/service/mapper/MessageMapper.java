@@ -15,7 +15,7 @@ public interface MessageMapper {
     @Insert("insert into message_board(message_id,family_id,publisher_id,content,image_url,publish_time,like_count,comment_count) values(#{messageId},#{familyId},#{publisherId},#{content},#{imageUrl},#{publishTime},#{likeCount},#{commentCount})")
     void insertMessage(MessageBoard messageBoard);
 
-    List<MessageBoard> selectMessage(String familyId, String publisherId, Integer timePeriod);
+    List<MessageBoard> selectMessage(String familyId,  Integer timePeriod);
 
     @Update("update message_board set like_count = #{likeCount} ,comment_count = #{commentCount} where message_id = #{messageId}")
     void updateMessage(MessageBoardVO likeMessageVO);
@@ -29,9 +29,13 @@ public interface MessageMapper {
     @Insert("insert into message_comment(comment_id,message_id,user_id,content,comment_time,reply_to_id) values(#{commentId},#{messageId},#{userId},#{content},#{commentTime},#{replyToId})")
     void insertMessageComment(MessageComment messageComment);
 
-    @Select("select content from message_comment where message_id = #{messageId} order by comment_time asc")
-    List<String> selectComment(String messageId);
 
     @Select("select * from message_comment where comment_id = #{commentId}")
     MessageComment selectMessageCommentById(String commentId);
+
+    @Select("select * from message_comment where message_id = #{messageId} order by comment_time ASC")
+    List<MessageComment> selectCommentByMessageId(String messageId);
+
+    @Update("update message_board set comment_count = comment_count + 1 where message_id = #{messageId}")
+    void updateCommentCount(String messageId);
 }

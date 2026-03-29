@@ -40,16 +40,12 @@ public class RedisComponent {
         return userId;
     }
 
-    public String refreshToken(String phoneNumber){
-        String newToken = TokenTools.getToken();
-        redisUtils.setEx(Constant.REDIS_TOKEN_KEY+phoneNumber,newToken,Constant.TOKEN_EXPIRE_HOURS);
-        return newToken;
+
+    public void save(String s, String role) {
+        redisUtils.setEx(s,role,Constant.TOKEN_EXPIRE_HOURS);
     }
 
-    public Boolean validateToken(String phoneNumber,String token){
-        String redisToken = redisUtils.get(Constant.REDIS_TOKEN_KEY+phoneNumber);
-        return redisToken != null && redisToken.equals(token);
+    public String get(String s){
+        return redisUtils.get(s);
     }
-
-
 }
