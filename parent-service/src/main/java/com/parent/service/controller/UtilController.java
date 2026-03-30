@@ -3,20 +3,20 @@ package com.parent.service.controller;
 import com.child.common.annotation.GlobalInterceptor;
 import com.child.common.constants.Constant;
 import com.child.common.entity.po.ExpertInfo;
-import com.child.common.entity.po.MessageBoard;
 import com.child.common.entity.po.MessageBoardExpert;
 import com.child.common.entity.po.UtilInfo;
 import com.child.common.entity.vo.MessageInfoVO;
 import com.child.common.redis.RedisComponent;
 import com.child.common.result.R;
 import com.github.pagehelper.PageInfo;
+
 import com.parent.service.service.UtilService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,6 +34,8 @@ public class UtilController {
     @Resource
     private RedisComponent redisComponent;
 
+
+
     @RequestMapping("/getList")
     public R<List<String>> getUtilList(@NotNull Integer type){
         return R.success(utilService.getUtilList(type));
@@ -46,6 +48,8 @@ public class UtilController {
     }
 
     // TODO 实现六个工具类逻辑
+
+
 
     // TODO 育儿知识
 

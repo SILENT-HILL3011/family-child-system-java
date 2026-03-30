@@ -9,7 +9,6 @@ import com.child.common.exception.BusinessException;
 import com.child.common.redis.RedisComponent;
 import com.child.common.utils.DateUtils;
 import com.child.common.utils.StringTools;
-import com.expert.service.entity.po.doctor.DoctorInfo;
 import com.expert.service.mapper.ExpertInfoMapper;
 import com.expert.service.service.ExpertService;
 import jakarta.annotation.Resource;
