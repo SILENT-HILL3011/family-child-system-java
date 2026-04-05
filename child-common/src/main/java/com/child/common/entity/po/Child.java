@@ -1,5 +1,7 @@
 package com.child.common.entity.po;
 
+import java.util.Date;
+
 public class Child {
 
     private String childId;
@@ -7,13 +9,55 @@ public class Child {
     private Integer sex;
     private String familyId;
     private String idNumber;
-    private Integer status;
     private Integer chineseWordCount;
     private Integer englishWordCount;
     private Integer poetryCount;
-    private String healthCondition;
-    private String dietaryStatus;
     private Integer age;
+    private Integer height;
+    private Integer weight;
+    private Integer headCirc;
+    private Date recordDate;
+    private Date birthDate;
+
+    public Integer getHeight() {
+        return height;
+    }
+
+    public void setHeight(Integer height) {
+        this.height = height;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public Date getRecordDate() {
+        return recordDate;
+    }
+
+    public void setRecordDate(Date recordDate) {
+        this.recordDate = recordDate;
+    }
+
+    public Integer getHeadCirc() {
+        return headCirc;
+    }
+
+    public void setHeadCirc(Integer headCirc) {
+        this.headCirc = headCirc;
+    }
+
+    public Integer getWeight() {
+        return weight;
+    }
+
+    public void setWeight(Integer weight) {
+        this.weight = weight;
+    }
 
     public Integer getAge() {
         return age;
@@ -63,14 +107,6 @@ public class Child {
         this.familyId = familyId;
     }
 
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
     public Integer getChineseWordCount() {
         return chineseWordCount;
     }
@@ -95,19 +131,4 @@ public class Child {
         this.englishWordCount = englishWordCount;
     }
 
-    public String getHealthCondition() {
-        return healthCondition;
-    }
-
-    public void setHealthCondition(String healthCondition) {
-        this.healthCondition = healthCondition;
-    }
-
-    public String getDietaryStatus() {
-        return dietaryStatus;
-    }
-
-    public void setDietaryStatus(String dietaryStatus) {
-        this.dietaryStatus = dietaryStatus;
-    }
 }

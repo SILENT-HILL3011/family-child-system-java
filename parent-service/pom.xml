@@ -47,7 +47,16 @@
             <version>22.3.5</version>
         </dependency>
 
-
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- 只有启动模块加这个！ -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

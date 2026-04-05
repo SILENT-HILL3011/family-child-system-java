@@ -9,26 +9,20 @@
         <result column="sex" property="sex"/>
         <result column="family_id" property="familyId"/>
         <result column="idnumber" property="idNumber"/>
-        <result column="status" property="status"/>
-        <result column="health_condition" property="healthCondition"/>
-        <result column="dietary_status" property="dietaryStatus"/>
         <result column="chinesewordcount" property="chineseWordCount"/>
         <result column="englishwordcount" property="englishWordCount"/>
         <result column="poetrycount" property="poetryCount"/>
+        <result column="birthdate" property="birthDate"/>
+        <result column="record_date" property="recordDate"/>
+        <result column="age" property="age"/>
+        <result column="head_circ" property="headCirc"/>
+        <result column="weight" property="weight"/>
+        <result column="height" property="height"/>
     </resultMap>
 
     <update id="update" parameterType="com.child.common.entity.po.Child">
         UPDATE child_info
         <set>
-            <if test="status != null">
-                status = #{status},
-            </if>
-            <if test="healthCondition != null">
-                health_condition = #{healthCondition},
-            </if>
-            <if test="dietaryStatus != null">
-                dietary_status = #{dietaryStatus},
-            </if>
             <if test="chineseWordCount != null">
                 chinesewordcount = #{chineseWordCount},
             </if>
@@ -41,7 +35,23 @@
             <if test="age != null">
                 age = #{age},
             </if>
+            <if test="birthDate != null">
+                birthdate = #{birthDate},
+            </if>
+            <if test="recordDate != null">
+                record_date = #{recordDate},
+            </if>
+            <if test="headCirc != null">
+                head_circ = #{headCirc},
+            </if>
+            <if test="weight != null">
+                weight = #{weight},
+            </if>
+            <if test="height != null">
+                height = #{height},
+            </if>
         </set>
+        where child_id = #{childId}
     </update>
 
 

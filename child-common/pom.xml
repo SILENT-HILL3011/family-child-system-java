@@ -22,6 +22,7 @@
         <aspectjweaver.version>1.9.4</aspectjweaver.version>
         <pagehelper.version>1.4.6</pagehelper.version>
         <easyExcel.version>3.3.2</easyExcel.version>
+        <fastjson.version>2.0.32</fastjson.version>
     </properties>
 
     <dependencies>
@@ -102,7 +103,11 @@
             <artifactId>spring-boot-starter-data-neo4j</artifactId>
         </dependency>
 
-
+        <dependency>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
+            <version>${fastjson.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

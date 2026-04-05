@@ -12,12 +12,25 @@ public class DateUtils {
 
     private static final Logger log = LoggerFactory.getLogger(DateUtils.class);
 
-    public static Date ChangeStr2Date(String dateStr) {
+    public static Date ChangeStr2DateTime(String dateStr) {
         if (dateStr == null || dateStr.trim().isEmpty()) {
             return null;
         }
         try {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Constant.PATTERN_DATETIME);
+            return simpleDateFormat.parse(dateStr);
+        } catch (ParseException e) {
+            log.error("日期转换异常", e);
+            return null;
+        }
+    }
+
+    public static Date ChangeStr2Date(String dateStr) {
+        if (dateStr == null || dateStr.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Constant.PATTERN_DATE);
             return simpleDateFormat.parse(dateStr);
         } catch (ParseException e) {
             log.error("日期转换异常", e);
@@ -61,4 +74,6 @@ public class DateUtils {
             return "";
         }
     }
+
+
 }

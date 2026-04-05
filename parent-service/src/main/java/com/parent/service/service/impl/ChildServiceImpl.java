@@ -1,32 +1,30 @@
 package com.parent.service.service.impl;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.fastjson2.JSON;
 import com.child.common.constants.Constant;
 import com.child.common.entity.enums.ChildVaccineEnum;
 import com.child.common.entity.enums.TimePerEnum;
 import com.child.common.entity.po.*;
 import com.child.common.entity.vo.ChildInfoVO;
-import com.child.common.entity.vo.GrowthConditionVO;
 import com.child.common.entity.vo.ResponseCodeEnum;
 import com.child.common.exception.BusinessException;
+import com.child.common.redis.RedisComponent;
 import com.child.common.utils.ChildVaccineUtil;
+import com.child.common.utils.DateUtils;
 import com.child.common.utils.StringTools;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.parent.service.mapper.ChildMapper;
-import com.parent.service.mapper.DailyTimeMapper;
-import com.parent.service.mapper.UserMapper;
-import com.parent.service.mapper.VaccineRecordMapper;
+import com.parent.service.mapper.*;
 import com.parent.service.service.ChildService;
 import jakarta.annotation.Resource;
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,18 +39,23 @@ public class ChildServiceImpl implements ChildService {
     private VaccineRecordMapper vaccineRecordMapper;
     @Resource
     private DailyTimeMapper dailyTimeMapper;
+    @Resource
+    private GrowthTrendMapper growthTrendMapper;
     @Value("${file.upload-path}")
     private String uploadPath;
+    @Resource
+    private RedisComponent redisComponent;
 
     @Override
-    public void addChild(String familyId, String childName, Integer sex,String idNumber) {
+    @Transactional(rollbackFor = Exception.class)
+    public void addChild(String familyId, String childName, Integer sex,String idNumber,String birthDate) {
         Family checkIsExist = userMapper.selectFamilyById(familyId);
         if (checkIsExist == null){
-            throw new BusinessException(ResponseCodeEnum.CODE_600);
+            throw new BusinessException("家庭不存在");
         }
         Child check = childMapper.selectByNameAndFamilyId(childName,familyId);
         if (check != null){
-            throw new BusinessException(ResponseCodeEnum.CODE_601);
+            throw new BusinessException("儿童不存在");
         }
         Child child = new Child();
         child.setChildName(childName);
@@ -60,6 +63,7 @@ public class ChildServiceImpl implements ChildService {
         child.setChildId(StringTools.getRandomNumber(Constant.LENGTH_12));
         child.setFamilyId(familyId);
         child.setIdNumber(idNumber);
+        child.setBirthDate(DateUtils.ChangeStr2Date(birthDate));
         childMapper.insert(child);
     }
 
@@ -67,13 +71,7 @@ public class ChildServiceImpl implements ChildService {
     public void updateChildInfo(Child child) {
         Child check = childMapper.selectById(child.getChildId());
         if (check == null){
-            throw new BusinessException(ResponseCodeEnum.CODE_602);
-        }
-        if (child.getHealthCondition() != null){
-            check.setHealthCondition(child.getHealthCondition());
-        }
-        if (child.getDietaryStatus() != null){
-            check.setDietaryStatus(child.getDietaryStatus());
+            throw new BusinessException("儿童不存在");
         }
         if (child.getChineseWordCount() != null){
             check.setChineseWordCount(child.getChineseWordCount());
@@ -84,41 +82,22 @@ public class ChildServiceImpl implements ChildService {
         if (child.getPoetryCount() != null){
             check.setPoetryCount(child.getPoetryCount());
         }
-        if (child.getStatus() != null){
-            check.setStatus(child.getStatus());
+        if (child.getHeight() != null){
+            check.setHeight(child.getHeight());
+        }
+        if (child.getWeight() != null){
+            check.setWeight(child.getWeight());
+        }
+        if (child.getHeadCirc() != null){
+            check.setHeadCirc(child.getHeadCirc());
         }
         if (child.getAge() != null){
             check.setAge(child.getAge());
         }
+        check.setRecordDate(new Date());
         childMapper.update(check);
-    }
-
-    @Override
-    public GrowthConditionVO getGrowthInfo(String childId) {
-        Child child = childMapper.selectById(childId);
-        if (child == null){
-            throw new BusinessException(ResponseCodeEnum.CODE_602);
-        }
-        GrowthConditionVO growthConditionVO = new GrowthConditionVO();
-        if(child.getChineseWordCount() != null){
-            growthConditionVO.setChineseWordCount(child.getChineseWordCount());
-        }
-        if(child.getEnglishWordCount() != null){
-            growthConditionVO.setEnglishWordCount(child.getEnglishWordCount());
-        }
-        if(child.getPoetryCount() != null){
-            growthConditionVO.setPoetryCount(child.getPoetryCount());
-        }
-        if(child.getHealthCondition() != null){
-            growthConditionVO.setHealthCondition(child.getHealthCondition());
-        }
-        if(child.getDietaryStatus() != null){
-            growthConditionVO.setDietaryStatus(child.getDietaryStatus());
-        }
-        if (child.getStatus() != null){
-            growthConditionVO.setStatus(child.getStatus());
-        }
-        return growthConditionVO;
+        redisComponent.saveChildInfo(child.getChildId(), JSON.toJSONString(check));
+        redisComponent.clearChildListCache();
     }
 
     @Override
@@ -233,9 +212,15 @@ public class ChildServiceImpl implements ChildService {
         if (pageNum == null){
             pageNum = Constant.NUM_ONE;
         }
+        String json = redisComponent.getChildList(familyId, pageNum);
+        if (json != null) {
+            return JSON.parseObject(json, PageInfo.class);
+        }
         List<ChildInfoVO> childInfoVOList = childMapper.selectChildInfo(familyId);
         PageHelper.startPage(pageNum, 10);
-        return new PageInfo<>(childInfoVOList);
+        PageInfo<ChildInfoVO> pageInfo = new PageInfo<>(childInfoVOList);
+        redisComponent.saveChildList(familyId, pageNum, JSON.toJSONString(pageInfo));
+        return pageInfo;
     }
 
     @Override
@@ -274,6 +259,100 @@ public class ChildServiceImpl implements ChildService {
         EasyExcel.write(response.getOutputStream(), DailyTimeExcel.class)
                 .sheet("生活记录")
                 .doWrite(excelList);
+    }
+
+    @Override
+    public void updateGrowthRecord(String childId,Integer height,Integer weight,Integer headCirc){
+        Child child = childMapper.selectById(childId);
+        if (child == null){
+            throw new BusinessException("儿童信息不存在");
+        }
+        child.setHeight(height);
+        child.setWeight(weight);
+        child.setHeadCirc(headCirc);
+        child.setRecordDate(new Date());
+        childMapper.update(child);
+    }
+
+    @Override
+    public void recordGrowth(GrowthTrend growthTrend) {
+        String childId = growthTrend.getChildId();
+        if (childId == null || childId.isBlank()) {
+            throw new BusinessException("儿童ID不能为空");
+        }
+        Child child = childMapper.selectById(childId);
+        if (child == null) {
+            throw new BusinessException("儿童信息不存在");
+        }
+        java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
+        GrowthTrend todayRecord = growthTrendMapper.selectByChildIdAndDate(childId, today);
+        if (todayRecord != null) {
+            if (growthTrend.getHeight() != null) {
+                todayRecord.setHeight(growthTrend.getHeight());
+            }
+            if (growthTrend.getWeight() != null) {
+                todayRecord.setWeight(growthTrend.getWeight());
+            }
+            if (growthTrend.getHeadCirc() != null) {
+                todayRecord.setHeadCirc(growthTrend.getHeadCirc());
+            }
+            Integer addCn = growthTrend.getChineseWordCount();
+            if (addCn != null && addCn > 0) {
+                todayRecord.setChineseWordCount((todayRecord.getChineseWordCount() == null ? 0 : todayRecord.getChineseWordCount()) + addCn);
+            }
+            Integer addEn = growthTrend.getEnglishWordCount();
+            if (addEn != null && addEn > 0) {
+                todayRecord.setEnglishWordCount((todayRecord.getEnglishWordCount() == null ? 0 : todayRecord.getEnglishWordCount()) + addEn);
+            }
+            Integer addPoem = growthTrend.getPoetryCount();
+            if (addPoem != null && addPoem > 0) {
+                todayRecord.setPoetryCount((todayRecord.getPoetryCount() == null ? 0 : todayRecord.getPoetryCount()) + addPoem);
+            }
+            growthTrendMapper.updateById(todayRecord);
+        } else {
+            growthTrend.setId(StringTools.getRandomNumber(Constant.LENGTH_12));
+            growthTrend.setRecordDate(today); // 存入 DATE 类型
+            growthTrendMapper.insertGrowthTrend(growthTrend);
+        }
+        if (growthTrend.getHeight() != null) {
+            child.setHeight(growthTrend.getHeight());
+        }
+        if (growthTrend.getWeight() != null) {
+            child.setWeight(growthTrend.getWeight());
+        }
+        if (growthTrend.getHeadCirc() != null) {
+            child.setHeadCirc(growthTrend.getHeadCirc());
+        }
+        Integer addChinese = growthTrend.getChineseWordCount();
+        if (addChinese != null && addChinese > 0) {
+            Integer old = child.getChineseWordCount() == null ? 0 : child.getChineseWordCount();
+            child.setChineseWordCount(old + addChinese);
+        }
+        Integer addEnglish = growthTrend.getEnglishWordCount();
+        if (addEnglish != null && addEnglish > 0) {
+            Integer old = child.getEnglishWordCount() == null ? 0 : child.getEnglishWordCount();
+            child.setEnglishWordCount(old + addEnglish);
+        }
+        Integer addPoetry = growthTrend.getPoetryCount();
+        if (addPoetry != null && addPoetry > 0) {
+            Integer old = child.getPoetryCount() == null ? 0 : child.getPoetryCount();
+            child.setPoetryCount(old + addPoetry);
+        }
+        child.setRecordDate(today);
+        childMapper.update(child);
+    }
+
+    @Override
+    public List<GrowthTrend> searchGrowth(String childId, Integer days) {
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(days);
+        java.sql.Date start = java.sql.Date.valueOf(startDate);
+        java.sql.Date end = java.sql.Date.valueOf(endDate);
+        Child child = childMapper.selectById(childId);
+        if (child == null){
+            throw new BusinessException("儿童信息不存在");
+        }
+        return growthTrendMapper.selectByChildIdAndDateRange(childId, start, end);
     }
 
     private int getValue(Integer num) {

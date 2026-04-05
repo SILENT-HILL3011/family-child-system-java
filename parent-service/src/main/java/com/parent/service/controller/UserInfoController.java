@@ -6,7 +6,7 @@ import com.child.common.entity.po.Member;
 import com.child.common.entity.po.User;
 import com.child.common.redis.RedisComponent;
 import com.child.common.result.R;
-import com.child.common.vo.UserLoginVO;
+import com.child.common.entity.vo.UserLoginVO;
 import com.github.pagehelper.PageInfo;
 import com.parent.service.service.UserService;
 import jakarta.annotation.Resource;
@@ -17,8 +17,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/child/user")

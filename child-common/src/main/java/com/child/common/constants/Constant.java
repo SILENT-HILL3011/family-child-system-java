@@ -31,4 +31,8 @@ public class Constant {
     public static final String TOMORROW_SCHEDULE = "明天日程：";
     public static final String SCHEDULE_TIME = "时间：";
     public static final String EXPIRE_REMIND = "【即将开始！1小时后日程】";
+
+    public static final String REDIS_CHILD_INFO_KEY = "child:info:";       // 儿童详情
+    public static final String REDIS_CHILD_LIST_KEY = "child:list:";       // 儿童列表
+    public static final long CHILD_CACHE_EXPIRE_SECONDS = 86400;           // 1天过期
 }

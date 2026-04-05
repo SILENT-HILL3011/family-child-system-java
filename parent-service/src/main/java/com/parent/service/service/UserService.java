@@ -2,10 +2,7 @@ package com.parent.service.service;
 
 import com.child.common.entity.po.Member;
 import com.child.common.entity.po.User;
-import com.child.common.vo.UserLoginVO;
 import com.github.pagehelper.PageInfo;
-
-import java.util.List;
 
 public interface UserService {
      void register(String phoneNumber, String password);

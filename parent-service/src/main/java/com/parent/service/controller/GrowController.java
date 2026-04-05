@@ -1,12 +1,8 @@
 package com.parent.service.controller;
 
 import com.child.common.annotation.GlobalInterceptor;
-import com.child.common.entity.po.Child;
-import com.child.common.entity.po.DailyTime;
-import com.child.common.entity.po.Examination;
-import com.child.common.entity.po.VaccineRecord;
+import com.child.common.entity.po.*;
 import com.child.common.entity.vo.ChildInfoVO;
-import com.child.common.entity.vo.GrowthConditionVO;
 import com.child.common.entity.vo.ResponseCodeEnum;
 import com.child.common.exception.BusinessException;
 import com.child.common.result.R;
@@ -17,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,8 +30,8 @@ public class GrowController {
 
     @RequestMapping("/addChild")
     @GlobalInterceptor(checkLogin = true)
-    public R addChild(@NotEmpty String familyId, @NotEmpty String childName, @NotNull Integer sex,@NotEmpty String idNumber){
-        childService.addChild(familyId,childName,sex,idNumber);
+    public R addChild(@NotEmpty String familyId, @NotEmpty String childName, @NotNull Integer sex, @NotEmpty String idNumber, @NotEmpty String birthDate){
+        childService.addChild(familyId,childName,sex,idNumber,birthDate);
         return R.success();
     }
 
@@ -58,11 +55,20 @@ public class GrowController {
         return R.success();
     }
 
-    @RequestMapping("/getGrowthInfo")
+    @RequestMapping("/recordGrowth")
     @GlobalInterceptor(checkLogin = true)
-    public R<GrowthConditionVO> getGrowthInfo(@NotEmpty String childId){
-        return R.success(childService.getGrowthInfo(childId));
+    public R recordGrowth(@RequestBody GrowthTrend growthTrend){
+        childService.recordGrowth(growthTrend);
+        return R.success();
     }
+
+    @RequestMapping("/searchGrowth")
+    @GlobalInterceptor(checkLogin = true)
+    public R<List<GrowthTrend>> searchGrowth(@NotEmpty String childId,Integer days){
+        List<GrowthTrend> growthTrends = childService.searchGrowth(childId, days);
+        return R.success(growthTrends);
+    }
+
 
     @RequestMapping("/searchVaccine")
     @GlobalInterceptor(checkLogin = true)
@@ -116,6 +122,18 @@ public class GrowController {
     public void exportLive(@NotEmpty String childId, HttpServletResponse  response)throws Exception{
         System.out.println("后端收到的 childId：" + childId);
         childService.exportLive(childId, response);
+    }
+
+    @PostMapping("/updateGrowthRecord")
+    @GlobalInterceptor(checkLogin = true)
+    public R updateGrowthRecord(
+            @NotEmpty String childId,
+            @NotNull Integer height,
+            @NotNull Integer weight,
+            @NotNull Integer headCirc
+    ){
+        childService.updateGrowthRecord(childId, height, weight, headCirc);
+        return R.success();
     }
 
 }

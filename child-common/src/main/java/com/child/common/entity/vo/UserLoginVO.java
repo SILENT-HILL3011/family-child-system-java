@@ -1,4 +1,4 @@
-package com.child.common.vo;
+package com.child.common.entity.vo;
 
 public class UserLoginVO {
     private String userId;

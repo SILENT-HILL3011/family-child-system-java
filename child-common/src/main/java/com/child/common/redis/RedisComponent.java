@@ -45,7 +45,36 @@ public class RedisComponent {
         redisUtils.setEx(s,role,Constant.TOKEN_EXPIRE_HOURS);
     }
 
-    public String get(String s){
-        return redisUtils.get(s);
+    public String get(String key) {
+        return redisUtils.get(key);
+    }
+
+    public void saveChildInfo(String childId, String childJson) {
+        String key = Constant.REDIS_CHILD_INFO_KEY + childId;
+        redisUtils.setEx(key, childJson, Constant.CHILD_CACHE_EXPIRE_SECONDS);
+    }
+
+    public String getChildInfo(String childId) {
+        String key = Constant.REDIS_CHILD_INFO_KEY + childId;
+        return redisUtils.get(key);
+    }
+
+    public void deleteChildInfo(String childId) {
+        String key = Constant.REDIS_CHILD_INFO_KEY + childId;
+        redisUtils.delete(key);
+    }
+
+    public void saveChildList(String familyId, Integer pageNum, String listJson) {
+        String key = Constant.REDIS_CHILD_LIST_KEY + familyId + ":" + pageNum;
+        redisUtils.setEx(key, listJson, Constant.CHILD_CACHE_EXPIRE_SECONDS);
+    }
+
+    public String getChildList(String familyId, Integer pageNum) {
+        String key = Constant.REDIS_CHILD_LIST_KEY + familyId + ":" + pageNum;
+        return redisUtils.get(key);
+    }
+
+    public void clearChildListCache() {
+        redisUtils.deleteByPattern(Constant.REDIS_CHILD_LIST_KEY + "*");
     }
 }

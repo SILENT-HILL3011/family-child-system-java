@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component("redisUtils")
@@ -46,6 +47,21 @@ public class RedisUtils {
         }catch (Exception e){
             logger.error("设置redisKey:{},value:{},timeout:{}失败", key, value, timeout);
             return false;
+        }
+    }
+
+    public Set<String> keys(String pattern) {
+        return redisTemplate.keys(pattern);
+    }
+
+    public Long deleteBatch(Set<String> keys) {
+        return redisTemplate.delete(keys);
+    }
+
+    public void deleteByPattern(String pattern) {
+        Set<String> keys = keys(pattern);
+        if (keys != null && !keys.isEmpty()) {
+            deleteBatch(keys);
         }
     }
 }

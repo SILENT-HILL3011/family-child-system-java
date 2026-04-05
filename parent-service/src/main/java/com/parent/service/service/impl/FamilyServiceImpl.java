@@ -6,8 +6,6 @@ import com.child.common.entity.vo.MessageBoardVO;
 import com.child.common.exception.BusinessException;
 import com.child.common.utils.DateUtils;
 import com.child.common.utils.StringTools;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.parent.service.annotation.CheckPrimaryCaregiverLimit;
 import com.parent.service.mapper.MessageMapper;
 import com.parent.service.mapper.TaskMapper;
@@ -39,7 +37,7 @@ public class FamilyServiceImpl implements FamilyService {
         taskInfo.setTaskId(StringTools.getRandomNumber(Constant.LENGTH_12));
         taskInfo.setPublisherId(publisherId);
         taskInfo.setTaskName(taskName);
-        taskInfo.setPublishDate(DateUtils.ChangeStr2Date(publishDate));
+        taskInfo.setPublishDate(DateUtils.ChangeStr2DateTime(publishDate));
         taskInfo.setIsAccepted(Constant.NO);
         taskInfo.setIsFinished(Constant.NO);
         taskMapper.insertTask(taskInfo);

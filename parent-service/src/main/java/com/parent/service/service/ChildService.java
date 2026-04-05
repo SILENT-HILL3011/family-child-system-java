@@ -1,23 +1,17 @@
 package com.parent.service.service;
 
-import com.child.common.entity.po.Child;
-import com.child.common.entity.po.DailyTime;
-import com.child.common.entity.po.Examination;
-import com.child.common.entity.po.VaccineRecord;
+import com.child.common.entity.po.*;
 import com.child.common.entity.vo.ChildInfoVO;
-import com.child.common.entity.vo.GrowthConditionVO;
 import com.github.pagehelper.PageInfo;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
 public interface ChildService {
-    void addChild(String familyId, String childName, Integer sex,String idNumber);
+    void addChild(String familyId, String childName, Integer sex,String idNumber,String birthDate);
 
     void updateChildInfo(Child child);
 
-    GrowthConditionVO getGrowthInfo(String childId);
 
     VaccineRecord searchVaccine(String childId);
 
@@ -38,4 +32,11 @@ public interface ChildService {
     Child searchChildById(String childId);
 
     void exportLive(String childId, HttpServletResponse response)throws Exception;
+
+    void updateGrowthRecord(String childId,Integer height,Integer weight,Integer headCirc);
+
+
+    void recordGrowth(GrowthTrend growthTrend);
+
+    List<GrowthTrend> searchGrowth(String childId, Integer days);
 }

@@ -7,14 +7,13 @@ import com.child.common.entity.vo.ChildInfoVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 
-import java.util.Date;
 import java.util.List;
 
 public interface ChildMapper {
     @Select("select * from child_info where child_name = #{childName} and family_id = #{familyId}")
     Child selectByNameAndFamilyId(String childName, String familyId);
 
-    @Insert("insert into child_info(child_id, child_name, family_id, sex,idnumber) values(#{childId},#{childName},#{familyId},#{sex},#{idNumber})")
+    @Insert("insert into child_info(child_id, child_name, family_id, sex,idnumber,birthdate) values(#{childId},#{childName},#{familyId},#{sex},#{idNumber},#{birthDate})")
     void insert(Child child);
 
     @Select("select * from child_info where child_id = #{childId}")
@@ -41,4 +40,7 @@ public interface ChildMapper {
 
     @Select("select family_id,child_id,child_name,sex,age,idnumber from child_info where family_id = #{familyId}")
     List<ChildInfoVO> selectChildInfo(String familyId);
+
+
+
 }

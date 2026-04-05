@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.parent.service.mapper.GrowthTrendMapper">
+
+    <!-- 插入 -->
+    <insert id="insertGrowthTrend" parameterType="com.child.common.entity.po.GrowthTrend">
+        INSERT INTO growth_trend (
+            id, child_id, height, weight, head_circ,
+            chinese_word_count, english_word_count, poetry_count, record_date
+        ) VALUES (
+                     #{id}, #{childId}, #{height}, #{weight}, #{headCirc},
+                     #{chineseWordCount}, #{englishWordCount}, #{poetryCount}, #{recordDate}
+                 )
+    </insert>
+
+    <!-- 根据 childId + date 查询当天记录 -->
+    <select id="selectByChildIdAndDate" resultType="com.child.common.entity.po.GrowthTrend">
+        SELECT
+            id,
+            child_id AS childId,
+            height,
+            weight,
+            head_circ AS headCirc,
+            chinese_word_count AS chineseWordCount,
+            english_word_count AS englishWordCount,
+            poetry_count AS poetryCount,
+            record_date AS recordDate
+        FROM growth_trend
+        WHERE child_id = #{childId}
+          AND record_date = #{today}
+    </select>
+
+    <!-- 更新当天记录 -->
+    <update id="updateById" parameterType="com.child.common.entity.po.GrowthTrend">
+        UPDATE growth_trend
+        SET
+            height = #{height},
+            weight = #{weight},
+            head_circ = #{headCirc},
+            chinese_word_count = #{chineseWordCount},
+            english_word_count = #{englishWordCount},
+            poetry_count = #{poetryCount}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 查询儿童成长曲线 -->
+    <select id="selectByChildId" resultType="com.child.common.entity.po.GrowthTrend">
+        SELECT
+            id,
+            child_id AS childId,
+            height,
+            weight,
+            head_circ AS headCirc,
+            chinese_word_count AS chineseWordCount,
+            english_word_count AS englishWordCount,
+            poetry_count AS poetryCount,
+            record_date AS recordDate
+        FROM growth_trend
+        WHERE child_id = #{childId}
+        ORDER BY record_date ASC
+    </select>
+
+    <select id="selectByChildIdAndDateRange" resultType="com.child.common.entity.po.GrowthTrend">
+        SELECT
+            id,
+            child_id AS childId,
+            height,
+            weight,
+            head_circ AS headCirc,
+            chinese_word_count AS chineseWordCount,
+            english_word_count AS englishWordCount,
+            poetry_count AS poetryCount,
+            record_date AS recordDate
+        FROM growth_trend
+        WHERE child_id = #{childId}
+          AND record_date BETWEEN #{startDate} AND #{endDate}
+        ORDER BY record_date ASC
+    </select>
+
+</mapper>

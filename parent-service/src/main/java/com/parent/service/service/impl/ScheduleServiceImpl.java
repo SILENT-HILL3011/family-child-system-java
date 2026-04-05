@@ -26,7 +26,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public void createSchedule(String userId, String scheduleForm, String importance, String date, String work) {
-        Date curDate = DateUtils.ChangeStr2Date(date);
+        Date curDate = DateUtils.ChangeStr2DateTime(date);
         ScheduleInfo scheduleInfo = scheduleMapper.selectScheduleInfoByDate(curDate, userId);
         if (scheduleInfo != null) {
             throw new BusinessException("日程已存在");

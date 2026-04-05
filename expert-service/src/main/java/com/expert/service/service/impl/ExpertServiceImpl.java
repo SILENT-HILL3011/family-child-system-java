@@ -76,7 +76,7 @@ public class ExpertServiceImpl implements ExpertService {
         Examination examination = new Examination();
         examination.setExaminationId(StringTools.getRandomNumber(Constant.LENGTH_12));
         examination.setDoctorId(expertId);
-        examination.setExaminationTime(DateUtils.ChangeStr2Date(examinationTime));
+        examination.setExaminationTime(DateUtils.ChangeStr2DateTime(examinationTime));
         expertInfoMapper.insertExamination(examination);
         MainBox mainBox = new MainBox();
         mainBox.setId(StringTools.getRandomNumber(Constant.LENGTH_12));
