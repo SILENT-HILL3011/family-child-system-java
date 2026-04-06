@@ -7,6 +7,7 @@ import com.child.common.entity.vo.ChildInfoVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ChildMapper {
@@ -35,12 +36,12 @@ public interface ChildMapper {
     @Select("select * from personal_examination_record where doctor_id = #{doctorId}")
     Examination selectExaminationByDoctorId(String doctorId);
 
-    @Insert("insert into personal_examination_record(child_id,ischecked,doctor_id,examination_id,appointment_time) values(#{childId},#{isChecked},#{doctorId},#{examinationId},#{examinationTime})")
+    @Insert("insert into personal_examination_record(child_id,ischecked,doctor_id,examination_id,start_time) values(#{childId},#{isChecked},#{doctorId},#{examinationId},#{startTime})")
     void updateExamination(Examination examination);
 
     @Select("select family_id,child_id,child_name,sex,age,idnumber from child_info where family_id = #{familyId}")
     List<ChildInfoVO> selectChildInfo(String familyId);
 
 
-
+    List<Examination> selectAvailableExamination(LocalDateTime now);
 }

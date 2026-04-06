@@ -77,10 +77,17 @@ public class FamilyServiceImpl implements FamilyService {
     }
 
     @Override
-    public List<TaskInfo> searchTask(@NotEmpty String publisherId) {
-        List<TaskInfo> taskInfoList = taskMapper.selectByPublisherId(publisherId);
-        if (taskInfoList == null){
-            return null;
+    public List<TaskInfo> searchTask(@NotEmpty String familyId) {
+        List<String> memberofRole = userMapper.selectMemberByRole(familyId);
+        String one = memberofRole.get(0);
+        String another = memberofRole.get(1);
+        List<TaskInfo> taskInfoList0 = taskMapper.selectByPublisherId(one);
+        List<TaskInfo> taskInfoList1 = taskMapper.selectByPublisherId(another);
+        List<TaskInfo> taskInfoList = new ArrayList<>();
+        taskInfoList.addAll(taskInfoList0);
+        taskInfoList.addAll(taskInfoList1);
+        if (taskInfoList.isEmpty()){
+            return new ArrayList<>();
         }
         return taskInfoList.stream()
                 .filter(taskInfo -> taskInfo.getIsFinished().equals(Constant.NO))

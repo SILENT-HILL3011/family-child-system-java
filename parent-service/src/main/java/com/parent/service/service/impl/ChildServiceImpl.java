@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URLEncoder;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -162,7 +163,7 @@ public class ChildServiceImpl implements ChildService {
     }
 
     @Override
-    public Examination appointExamination(String childId, String doctorId) {
+    public Examination appointExamination(String childId, String doctorId,String startTime) {
         Examination examination = childMapper.selectExaminationByDoctorId(doctorId);
         if (examination == null){
             return null;
@@ -172,7 +173,7 @@ public class ChildServiceImpl implements ChildService {
         newExamination.setChildId(childId);
         newExamination.setChecked(Constant.IS);
         newExamination.setDoctorId(doctorId);
-        newExamination.setExaminationTime(new Date());
+        newExamination.setStartTime(DateUtils.ChangeStr2Date(startTime));
         childMapper.updateExamination(newExamination);
         return newExamination;
     }
@@ -353,6 +354,12 @@ public class ChildServiceImpl implements ChildService {
             throw new BusinessException("儿童信息不存在");
         }
         return growthTrendMapper.selectByChildIdAndDateRange(childId, start, end);
+    }
+
+    @Override
+    public List<Examination> loadExamination() {
+        LocalDateTime now = LocalDateTime.now();
+        return childMapper.selectAvailableExamination(now);
     }
 
     private int getValue(Integer num) {

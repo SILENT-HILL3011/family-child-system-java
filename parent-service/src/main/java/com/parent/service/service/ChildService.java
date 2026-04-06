@@ -19,7 +19,7 @@ public interface ChildService {
 
     List<String> searchVaccineThisYear(String childId);
 
-    Examination appointExamination(String childId, String doctorId);
+    Examination appointExamination(String childId, String doctorId,String startTime);
 
     void recordFood(String childId, Integer time, String food);
 
@@ -39,4 +39,6 @@ public interface ChildService {
     void recordGrowth(GrowthTrend growthTrend);
 
     List<GrowthTrend> searchGrowth(String childId, Integer days);
+
+    List<Examination> loadExamination();
 }

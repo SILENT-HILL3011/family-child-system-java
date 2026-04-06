@@ -20,7 +20,7 @@ public interface ExpertInfoMapper {
     @Select("select * from expert_info where expert_id = #{expertId}")
     ExpertInfo selectById(String expertId);
 
-    @Insert("insert into personal_examination_record(examination_id,doctor_id,appointment_time) values(#{examinationId},#{doctorId},#{examinationTime})")
+    @Insert("insert into personal_examination_record(examination_id,doctor_id,start_time,end_time) values(#{examinationId},#{doctorId},#{startTime},#{endTime})")
     void insertExamination(Examination examination);
 
     @Insert("insert into sys_message (id,send_user_id,title,content,create_time,is_read) values (#{id},#{sendUserId},#{title},#{content},#{createTime},#{isRead})")

@@ -56,4 +56,7 @@ public interface UserMapper {
 
     @Select("select count(*) from member_info where family_id = #{familyId} and role = 1")
     int countPrimaryByFamilyId(String familyId);
+
+    @Select("select member_id from member_info where family_id = #{familyId} and role = 1")
+    List<String> selectMemberByRole(String familyId);
 }

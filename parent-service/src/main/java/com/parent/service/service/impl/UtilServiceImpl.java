@@ -55,31 +55,6 @@ public class UtilServiceImpl implements UtilService {
         return PageInfo.of(expertInfoList);
     }
 
-//    @Override
-//    public void consultToExpert(String userId, String expertId, String message,String boardId) {
-//        MessageBoardExpert messageBoardExpert;
-//        if (boardId != null){
-//            messageBoardExpert = utilMapper.selectBoardExpertByBoardId(boardId);
-//            messageBoardExpert.setMessageCount(messageBoardExpert.getMessageCount()+1);
-//        }else {
-//            messageBoardExpert = new MessageBoardExpert();
-//            messageBoardExpert.setBoardId(StringTools.getRandomNumber(Constant.LENGTH_12));
-//            messageBoardExpert.setExpertId(expertId);
-//            messageBoardExpert.setUserId(userId);
-//            messageBoardExpert.setIsFinished(Constant.NO);
-//            messageBoardExpert.setMessageCount(Constant.NUM_ZERO);
-//        }
-//        messageBoardExpertMapper.insertMessageBoardExpert(messageBoardExpert);
-//        MessageInfo messageInfo = new MessageInfo();
-//        messageInfo.setMessageId(StringTools.getRandomNumber(Constant.LENGTH_12));
-//        messageInfo.setBoardId(messageBoardExpert.getBoardId());
-//        messageInfo.setText(message);
-//        messageInfo.setPublisherId(userId);
-//        messageInfo.setPublishDate(new Date());
-//        messageBoardExpert.setMessageCount(messageBoardExpert.getMessageCount()+1);
-//        messageBoardExpertMapper.updateMessageBoardExpert(messageBoardExpert);
-//        utilMapper.insertMessageInfo(messageInfo);
-//    }
 
     @Override
     public String consultToExpert(String userId, String expertId, String message, String boardId) {

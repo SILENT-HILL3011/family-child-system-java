@@ -56,10 +56,10 @@ public class ExpertInfoController {
 
     @RequestMapping("/createPersonalExamination")
     @GlobalInterceptor(checkLogin = true)
-    public R createPersonalExamination(@NotEmpty String examinationTime){
+    public R createPersonalExamination(@NotEmpty String startTime,@NotEmpty String endTime){
         String token = request.getHeader(Constant.TOKEN_HEADER_KEY);
         String expertId = redisComponent.getExpertIdByToken(token);
-        expertService.createPersonalExamination(expertId,examinationTime);
+        expertService.createPersonalExamination(expertId,startTime,endTime);
         return R.success();
     }
 }

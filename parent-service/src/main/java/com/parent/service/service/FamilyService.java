@@ -14,7 +14,7 @@ public interface FamilyService {
 
     TaskInfo finishTask(String receiverId, String taskName);
 
-    List<TaskInfo> searchTask(String publisherId);
+    List<TaskInfo> searchTask(String familyId);
 
     void publishMessage(String publisherId, String content, String imageUrl);
 

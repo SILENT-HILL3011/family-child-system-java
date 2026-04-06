@@ -65,18 +65,22 @@ public class ExpertServiceImpl implements ExpertService {
     }
 
     @Override
-    public void createPersonalExamination(String expertId, String examinationTime) {
+    public void createPersonalExamination(String expertId, String startTime, String endTime) {
         ExpertInfo expertInfo = expertInfoMapper.selectById(expertId);
         if (expertInfo == null){
             throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
-        if (!DateUtils.isValidDate(examinationTime)){
+        if (!DateUtils.isValidDate(startTime)){
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        if (!DateUtils.isValidDate(endTime)){
             throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
         Examination examination = new Examination();
         examination.setExaminationId(StringTools.getRandomNumber(Constant.LENGTH_12));
         examination.setDoctorId(expertId);
-        examination.setExaminationTime(DateUtils.ChangeStr2DateTime(examinationTime));
+        examination.setStartTime(DateUtils.ChangeStr2DateTime(startTime));
+        examination.setEndTime(DateUtils.ChangeStr2DateTime(endTime));
         expertInfoMapper.insertExamination(examination);
         MainBox mainBox = new MainBox();
         mainBox.setId(StringTools.getRandomNumber(Constant.LENGTH_12));

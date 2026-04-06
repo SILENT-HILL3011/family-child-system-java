@@ -9,6 +9,8 @@ import com.child.common.entity.po.User;
 import com.child.common.entity.vo.ResponseCodeEnum;
 import com.child.common.exception.BusinessException;
 import com.child.common.redis.RedisComponent;
+import com.child.common.utils.RequestHolder;
+import com.child.common.utils.SliderCaptchaUtil;
 import com.child.common.utils.StringTools;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -19,6 +21,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.List;
 
@@ -30,7 +33,7 @@ public class UserServiceImpl implements UserService {
     @Resource
     private RedisComponent redisComponent;
     @Resource
-    private HttpServletRequest request;
+    private SliderCaptchaUtil sliderCaptchaUtil;
 
     @Override
     public void register(String phoneNumber, String password) {
@@ -47,17 +50,49 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String login(String phoneNumber, String password) {
-        User checkIsExist = userMapper.selectByPhoneNumber(phoneNumber);
-        if (checkIsExist == null || !StringTools.getMd5(password).equals(checkIsExist.getPassword())){
+    public String login(String phoneNumber, String password, String captchaKey, String moveX) {
+        // 获取IP
+        String ip = RequestHolder.getIp();
+
+        // 1. 判断IP是否被锁定
+        if (redisComponent.isIpLocked(ip)) {
             throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
-        String token = StringTools.getMd5(checkIsExist.getUserId()+StringTools.getRandomNumber(Constant.LENGTH_20));
-        redisComponent.saveUserLoginToken(token,checkIsExist.getUserId());
+
+        // 2. 滑动验证码校验
+        if (!sliderCaptchaUtil.checkSlider(captchaKey, moveX)) {
+            // 记录失败次数
+            int failCount = redisComponent.getLoginFailCount(ip) + 1;
+            redisComponent.saveLoginFailCount(ip, failCount);
+            if (failCount >= 3) {
+                redisComponent.lockIp(ip);
+            }
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+
+        // 3. 账号密码校验
+        User checkIsExist = userMapper.selectByPhoneNumber(phoneNumber);
+        if (checkIsExist == null || !StringTools.getMd5(password).equals(checkIsExist.getPassword())) {
+            // 记录失败次数
+            int failCount = redisComponent.getLoginFailCount(ip) + 1;
+            redisComponent.saveLoginFailCount(ip, failCount);
+            if (failCount >= 3) {
+                redisComponent.lockIp(ip);
+            }
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+
+        // 4. 登录成功 → 清空失败记录
+        redisComponent.clearLoginFail(ip);
+
+        // ===================== 你原有代码不动 =====================
+        String token = StringTools.getMd5(checkIsExist.getUserId() + StringTools.getRandomNumber(Constant.LENGTH_20));
+        redisComponent.saveUserLoginToken(token, checkIsExist.getUserId());
+
         Member member = userMapper.selectMemberByPhone(phoneNumber);
-        if (member != null){
-            redisComponent.save(Constant.REDIS_ROLE_KEY + token,member.getRole().toString());
-            redisComponent.save(Constant.REDIS_FAMILY_KEY + token,member.getFamilyId());
+        if (member != null) {
+            redisComponent.save(Constant.REDIS_ROLE_KEY + token, member.getRole().toString());
+            redisComponent.save(Constant.REDIS_FAMILY_KEY + token, member.getFamilyId());
         }
         return token;
     }
@@ -165,6 +200,8 @@ public class UserServiceImpl implements UserService {
         member.setPhone(phone);
         userMapper.insertMember(member);
     }
+
+
 
 
 }

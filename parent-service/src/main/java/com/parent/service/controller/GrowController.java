@@ -93,10 +93,19 @@ public class GrowController {
 
     @RequestMapping("/appointExamination")
     @GlobalInterceptor(checkLogin = true)
-    public R<Examination> appointExamination(@NotEmpty String childId,@NotEmpty String doctorId){
-        Examination examination = childService.appointExamination(childId,doctorId);
+    public R<Examination> appointExamination(@NotEmpty String childId,@NotEmpty String doctorId,@NotEmpty String startTime){
+        Examination examination = childService.appointExamination(childId,doctorId,startTime);
         return R.success(examination);
     }
+
+    @RequestMapping("/searchExamination")
+    @GlobalInterceptor(checkLogin = true)
+    public R<List<Examination>> searchExamination(){
+        return R.success(childService.loadExamination());
+    }
+
+
+
 
     @RequestMapping("/recordLive")
     @GlobalInterceptor(checkLogin = true)

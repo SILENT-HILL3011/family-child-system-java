@@ -47,12 +47,6 @@ public class UtilController {
         return R.success(utilInfo);
     }
 
-    // TODO 实现六个工具类逻辑
-
-
-
-    // TODO 育儿知识
-
     @RequestMapping("/getExpertByType")
     @GlobalInterceptor(checkLogin = true)
     public R<PageInfo<ExpertInfo>> getExpertByType(@NotNull Integer type, Integer pageNum){

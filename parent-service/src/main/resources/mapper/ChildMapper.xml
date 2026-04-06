@@ -54,5 +54,20 @@
         where child_id = #{childId}
     </update>
 
+    <select id="selectAvailableExamination" resultType="com.child.common.entity.po.Examination">
+        SELECT *
+        FROM personal_examination_record e1
+        WHERE
+            #{now} &lt; e1.start_time
+          AND #{now} &lt; e1.end_time
+          AND e1.child_id IS NULL
+          AND e1.isChecked IS NULL
+          AND NOT EXISTS (
+            SELECT 1
+            FROM personal_examination_record e2
+            WHERE e2.start_time = e1.start_time
+              AND e2.child_id IS NOT NULL
+        )
+    </select>
 
 </mapper>

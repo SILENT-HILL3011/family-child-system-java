@@ -77,4 +77,36 @@ public class RedisComponent {
     public void clearChildListCache() {
         redisUtils.deleteByPattern(Constant.REDIS_CHILD_LIST_KEY + "*");
     }
+
+    // ===================== 登录失败锁定IP相关 =====================
+// 保存登录失败次数（10分钟）
+    public void saveLoginFailCount(String ip, int count) {
+        String key = "login:fail:" + ip;
+        redisUtils.setEx(key, String.valueOf(count), 10 * 60); // 10分钟
+    }
+
+    // 获取登录失败次数
+    public int getLoginFailCount(String ip) {
+        String key = "login:fail:" + ip;
+        String countStr = redisUtils.get(key);
+        return countStr == null ? 0 : Integer.parseInt(countStr);
+    }
+
+    // 锁定IP 10分钟
+    public void lockIp(String ip) {
+        String key = "login:lock:" + ip;
+        redisUtils.setEx(key, "locked", 10 * 60);
+    }
+
+    // 判断IP是否被锁定
+    public boolean isIpLocked(String ip) {
+        String key = "login:lock:" + ip;
+        return redisUtils.get(key) != null;
+    }
+
+    // 清空登录失败记录
+    public void clearLoginFail(String ip) {
+        redisUtils.delete("login:fail:" + ip);
+        redisUtils.delete("login:lock:" + ip);
+    }
 }

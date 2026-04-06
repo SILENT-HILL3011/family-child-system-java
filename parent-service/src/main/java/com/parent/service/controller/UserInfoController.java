@@ -7,16 +7,18 @@ import com.child.common.entity.po.User;
 import com.child.common.redis.RedisComponent;
 import com.child.common.result.R;
 import com.child.common.entity.vo.UserLoginVO;
+import com.child.common.utils.SliderCaptchaUtil;
 import com.github.pagehelper.PageInfo;
 import com.parent.service.service.UserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/child/user")
@@ -29,10 +31,25 @@ public class UserInfoController {
     @Resource
     private HttpServletRequest request;
 
+    @Resource
+    private SliderCaptchaUtil sliderCaptchaUtil;
+
+    @GetMapping("/slider/get")
+    public R<Map<String,String>> getCaptcha(){
+        return R.success(sliderCaptchaUtil.createSliderCaptcha());
+    }
+
+    @PostMapping("/slider/check")
+    public boolean checkCaptcha(
+            String key,
+            String moveX
+    ) {
+        return sliderCaptchaUtil.checkSlider(key, moveX);
+    }
 
     @RequestMapping("/login")
-    public R<String> login(@NotEmpty String phoneNumber, @NotEmpty String password){
-        String token =  userService.login(phoneNumber, password);
+    public R<String> login(@NotEmpty String phoneNumber, @NotEmpty String password,String captchaKey,String moveX){
+        String token =  userService.login(phoneNumber, password,captchaKey,moveX);
         return R.success(token);
     }
 

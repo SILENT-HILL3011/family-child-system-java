@@ -12,17 +12,19 @@ public interface MailBoxMapper {
     @Insert("insert into main_box(id, send_user_id, title, user_id, content,is_read) values(#{id}, #{sendUserId}, #{title}, #{userId}, #{content},#{isRead})")
     void insert(MainBox mainBox);
 
-    @Select("SELECT \n" +
-            "    id,\n" +
-            "    send_user_id,\n" +
-            "    title,\n" +
-            "    create_time,\n" +
-            "    is_read\n" +
-            "FROM sys_message\n" +
-            "WHERE user_id = #{userId}\n" +
-            "ORDER BY \n" +
-            "    is_read ASC,  \n" +
-            "    create_time DESC ")
+    @Select({
+            "SELECT",
+            "    id,",
+            "    send_user_id,",
+            "    title,",
+            "    create_time,",
+            "    is_read",
+            "FROM sys_message",
+            "WHERE user_id = #{userId} OR user_id IS NULL",
+            "ORDER BY",
+            "    is_read ASC,",
+            "    create_time DESC"
+    })
     List<MailBoxVO> searchMailList(String userId, Integer pageNum);
 
     @Select("select * from sys_message where id = #{mailId}")

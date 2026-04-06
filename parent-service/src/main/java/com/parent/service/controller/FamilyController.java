@@ -35,6 +35,7 @@ public class FamilyController {
 
     @RequestMapping("/publishTask")
     @GlobalInterceptor(checkLogin = true)
+    @RequirePrimaryCaregiver
     public R publishTask(@NotEmpty String taskName, @NotEmpty String publishDate){
         String token = request.getHeader(Constant.TOKEN_HEADER_KEY);
         String publisherId = redisComponent.getUserIdByToken(token);
