@@ -48,4 +48,12 @@ public class MailController {
         mailBoxService.readAll(userId);
         return R.success();
     }
+
+    @RequestMapping("/checkUnReadMails")
+    @GlobalInterceptor(checkLogin = true)
+    public R<Boolean> checkUnReadMails(){
+        String token = request.getHeader(Constant.TOKEN_HEADER_KEY);
+        String userId = redisComponent.getUserIdByToken(token);
+        return R.success(mailBoxService.checkUnReadMails(userId));
+    }
 }

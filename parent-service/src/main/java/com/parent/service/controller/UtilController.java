@@ -1,7 +1,9 @@
 package com.parent.service.controller;
 
+import com.alibaba.fastjson2.JSON;
 import com.child.common.annotation.GlobalInterceptor;
 import com.child.common.constants.Constant;
+import com.child.common.entity.po.ChatMessage;
 import com.child.common.entity.po.ExpertInfo;
 import com.child.common.entity.po.MessageBoardExpert;
 import com.child.common.entity.po.UtilInfo;
@@ -10,6 +12,7 @@ import com.child.common.redis.RedisComponent;
 import com.child.common.result.R;
 import com.github.pagehelper.PageInfo;
 
+import com.parent.service.netty.NettyServerHandler;
 import com.parent.service.service.UtilService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -60,6 +63,14 @@ public class UtilController {
         String token = request.getHeader(Constant.TOKEN_HEADER_KEY);
         String userId = redisComponent.getUserIdByToken(token);
         String id =  utilService.consultToExpert(userId,expertId,message,boardId);
+        ChatMessage msg = new ChatMessage();
+        msg.setBoardId(id);
+        msg.setFormId(userId);
+        msg.setToId(expertId);
+        msg.setContent(message);
+        msg.setPublishTime(System.currentTimeMillis());
+        String json = JSON.toJSONString(msg);
+        NettyServerHandler.sendToUser(expertId,json);
         return R.success(id);
     }
 
@@ -72,7 +83,9 @@ public class UtilController {
 
     @RequestMapping("/getMessageInfoByBoardId")
     public R getMessageInfoByBoardId(@NotEmpty String boardId) {
-        List<MessageInfoVO> list = utilService.selectMessageInfoByBoardId(boardId);
+        String token = request.getHeader(Constant.TOKEN_HEADER_KEY);
+        String userId = redisComponent.getUserIdByToken(token);
+        List<MessageInfoVO> list = utilService.selectMessageInfoByBoardId(boardId, userId);
         return R.success(list);
     }
 

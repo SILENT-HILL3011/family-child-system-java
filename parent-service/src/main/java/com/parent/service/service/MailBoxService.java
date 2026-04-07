@@ -9,4 +9,6 @@ public interface MailBoxService {
     String readMail(String mailId);
 
     void readAll(String userId);
+
+    Boolean checkUnReadMails(String userId);
 }

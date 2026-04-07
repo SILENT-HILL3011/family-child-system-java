@@ -11,6 +11,15 @@ public class MessageInfoVO {
     private Date publishDate;
     private String expertId;
     private String userId;
+    private Boolean isSelf;
+
+    public Boolean getSelf() {
+        return isSelf;
+    }
+
+    public void setSelf(Boolean self) {
+        isSelf = self;
+    }
 
     public String getMessageId() {
         return messageId;

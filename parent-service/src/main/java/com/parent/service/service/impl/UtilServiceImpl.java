@@ -13,6 +13,7 @@ import com.parent.service.service.UtilService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -59,13 +60,9 @@ public class UtilServiceImpl implements UtilService {
     @Override
     public String consultToExpert(String userId, String expertId, String message, String boardId) {
         MessageBoardExpert messageBoardExpert = null;
-
-        // 1. 有 boardId → 查询旧会话
         if (boardId != null && !boardId.isEmpty()) {
             messageBoardExpert = utilMapper.selectBoardExpertByBoardId(boardId);
         }
-
-        // 2. 没有会话 → 新建（第一次发送 / 找不到旧会话）
         if (messageBoardExpert == null) {
             messageBoardExpert = new MessageBoardExpert();
             messageBoardExpert.setBoardId(StringTools.getRandomNumber(Constant.LENGTH_12));
@@ -73,11 +70,8 @@ public class UtilServiceImpl implements UtilService {
             messageBoardExpert.setUserId(userId);
             messageBoardExpert.setIsFinished(Constant.NO);
             messageBoardExpert.setMessageCount(0);
-            // ✅ 新会话：插入
             messageBoardExpertMapper.insertMessageBoardExpert(messageBoardExpert);
         }
-
-        // 3. 插入消息（一定会执行）
         MessageInfo messageInfo = new MessageInfo();
         messageInfo.setMessageId(StringTools.getRandomNumber(Constant.LENGTH_12));
         messageInfo.setBoardId(messageBoardExpert.getBoardId());
@@ -85,12 +79,8 @@ public class UtilServiceImpl implements UtilService {
         messageInfo.setPublisherId(userId);
         messageInfo.setPublishDate(new Date());
         utilMapper.insertMessageInfo(messageInfo);
-
-        // 4. 更新消息数量
         messageBoardExpert.setMessageCount(messageBoardExpert.getMessageCount() + 1);
-        // ✅ 旧会话：更新
         messageBoardExpertMapper.updateMessageBoardExpert(messageBoardExpert);
-
         return messageBoardExpert.getBoardId();
     }
 
@@ -112,11 +102,15 @@ public class UtilServiceImpl implements UtilService {
     }
 
     @Override
-    public List<MessageInfoVO> selectMessageInfoByBoardId(String boardId) {
+    public List<MessageInfoVO> selectMessageInfoByBoardId(String boardId,String userId) {
         List<MessageInfoVO> messageInfoVOList = utilMapper.selectMessageInfoByBoardId(boardId);
         if (messageInfoVOList == null) {
             return null;
         }
+        for (MessageInfoVO vo : messageInfoVOList){
+            vo.setSelf(vo.getPublisherId().equals(userId));
+        }
+        messageInfoVOList.sort(Comparator.comparing(MessageInfoVO::getPublishDate));
         return messageInfoVOList;
     }
 }

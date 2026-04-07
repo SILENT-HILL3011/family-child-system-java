@@ -54,8 +54,8 @@ public class FamilyController {
 
     @RequestMapping("/searchTask")
     @GlobalInterceptor(checkLogin = true)
-    public R<List<TaskInfo>> searchTask(@NotEmpty String publisherId){
-        List<TaskInfo> taskInfos = familyService.searchTask(publisherId);
+    public R<List<TaskInfo>> searchTask(@NotEmpty String familyId){
+        List<TaskInfo> taskInfos = familyService.searchTask(familyId);
         return R.success(taskInfos);
     }
 

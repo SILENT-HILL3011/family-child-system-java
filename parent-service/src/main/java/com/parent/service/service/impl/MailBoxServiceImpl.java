@@ -40,4 +40,10 @@ public class MailBoxServiceImpl implements MailBoxService {
     public void readAll(String userId) {
         mailBoxMapper.readAll(userId);
     }
+
+    @Override
+    public Boolean checkUnReadMails(String userId) {
+        List<MailBoxVO> unreadList  = mailBoxMapper.findUnreadMails(userId);
+        return unreadList != null && !unreadList.isEmpty();
+    }
 }

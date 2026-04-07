@@ -9,7 +9,7 @@ public interface UserService {
 
      User updateUserInfo(User user);
 
-     String login(String phoneNumber, String password,String key,String code);
+     String login(String phoneNumber, String  password);
 
      void createFamily(String userId, String familyName,String seniority);
 

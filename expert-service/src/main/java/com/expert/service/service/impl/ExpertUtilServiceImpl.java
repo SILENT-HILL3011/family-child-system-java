@@ -3,6 +3,7 @@ package com.expert.service.service.impl;
 import com.child.common.constants.Constant;
 import com.child.common.entity.po.MessageBoardExpert;
 import com.child.common.entity.po.MessageInfo;
+import com.child.common.entity.vo.MessageInfoVO;
 import com.child.common.utils.StringTools;
 import com.expert.service.mapper.MessageBoardExpertMapper;
 import com.expert.service.service.ExpertUtilService;
@@ -11,6 +12,7 @@ import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -31,10 +33,17 @@ public class ExpertUtilServiceImpl implements ExpertUtilService {
     }
 
     @Override
-    public List<MessageInfo> history(String boardId) {
-        List<MessageInfo> list = messageBoardExpertMapper.history(boardId);
+    public List<MessageInfoVO> history(String boardId, String expertId) {
+        List<MessageInfoVO> list = messageBoardExpertMapper.history(boardId);
         if (list == null){
-            return null;
+            return new ArrayList<>();
+        }
+        for (MessageInfoVO msg : list){
+            Boolean isSelf = false;
+            if (msg.getPublisherId() != null && expertId != null) {
+                isSelf = msg.getPublisherId().equals(expertId);
+            }
+            msg.setSelf(isSelf);
         }
         return list;
     }

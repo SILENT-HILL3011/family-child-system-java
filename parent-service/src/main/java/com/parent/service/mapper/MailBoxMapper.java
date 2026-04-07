@@ -35,4 +35,7 @@ public interface MailBoxMapper {
 
     @Update("update sys_message set is_read = 1 where user_id = #{userId} and is_read = 0 ")
     void readAll(String userId);
+
+    @Select("select * from sys_message where ( user_id = #{userId} or user_id is null ) and is_read = 0")
+    List<MailBoxVO> findUnreadMails(String userId);
 }

@@ -24,5 +24,5 @@ public interface UtilService {
 
     void finishMessage(String boardId);
 
-    List<MessageInfoVO> selectMessageInfoByBoardId(String boardId);
+    List<MessageInfoVO> selectMessageInfoByBoardId(String boardId,String userId);
 }
