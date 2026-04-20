@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class DateUtils {
@@ -75,5 +76,19 @@ public class DateUtils {
         }
     }
 
+
+    public static Integer getAge(String birthDate) {
+        Date birthdate = ChangeStr2Date(birthDate);
+        if (birthdate == null) {
+            return null;
+        }
+        Calendar birth = Calendar.getInstance();
+        birth.setTime(birthdate);
+        Calendar now = Calendar.getInstance();
+        now.setTime(new Date());
+        int month = (now.get(Calendar.YEAR) - birth.get(Calendar.YEAR)) * 12;
+        month += now.get(Calendar.MONTH) - birth.get(Calendar.MONTH);
+        return month;
+    }
 
 }

@@ -13,7 +13,6 @@ import com.child.common.utils.RequestHolder;
 import com.child.common.utils.StringTools;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.parent.service.annotation.CheckPrimaryCaregiverLimit;
 import com.parent.service.mapper.UserMapper;
 import com.parent.service.service.UserService;
 import jakarta.annotation.Resource;
@@ -73,34 +72,27 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void createFamily(String userId,String familyName,String seniority) {
-        Family checkIsExist = userMapper.selectFamilyById(userId);
-        if (checkIsExist != null){
-            throw new BusinessException(ResponseCodeEnum.CODE_600);
-        }
         User user = userMapper.selectById(userId);
         if (user.getHaveFamily() == 1){
-            throw new BusinessException(ResponseCodeEnum.CODE_600);
+            throw new BusinessException("家庭已存在");
         }
         Family family = new Family();
         family.setFamilyId(StringTools.getRandomNumber(Constant.LENGTH_12));
         family.setCreateUserId(userId);
         family.setFamilyName(familyName);
         userMapper.insertFamily(family);
-        userMapper.updateUserFamily(userId);
-        addMember(userId,family.getFamilyId(),user.getUserName(),seniority, MemberRoleEnum.MAIN.getCode(),user.getPhoneNumber());
+        addMember(userId,family.getFamilyId(),user.getUserName(),seniority, MemberRoleEnum.MAIN.getCode(),user.getPhoneNumber(),user.getAvatar());
         user.setHaveFamily(Constant.IS);
         userMapper.updateUserInfo(user);
     }
 
     @Override
-    @CheckPrimaryCaregiverLimit
     public void inviteMember(String phoneNumber, String familyId,String seniority,Integer role) {
         User user = userMapper.selectByPhoneNumber(phoneNumber);
-        String id = user.getUserId();
         if (user == null) {
-            throw new BusinessException(ResponseCodeEnum.CODE_600); // 或其他适当的错误码
+            throw new BusinessException("用户不存在");
         }
-        addMember(user.getUserId(),familyId,user.getUserName(),seniority, role,user.getPhoneNumber());
+        addMember(user.getUserId(),familyId,user.getUserName(),seniority, role,user.getPhoneNumber(),user.getAvatar());
     }
 
     @Override
@@ -138,6 +130,9 @@ public class UserServiceImpl implements UserService {
         if (user.getMail() != null){
             updateUser.setMail(user.getMail());
         }
+        if (user.getAvatar() != null){
+            updateUser.setAvatar(user.getAvatar());
+        }
         userMapper.updateUserInfo(updateUser);
         return null;
     }
@@ -147,9 +142,9 @@ public class UserServiceImpl implements UserService {
         if (pageNum == null){
             pageNum = Constant.NUM_ONE;
         }
-        List<Member> memberList = userMapper.selectMemberList(userId);
         PageHelper.startPage(pageNum, 10);
-        return PageInfo.of(memberList);
+        List<Member> memberList = userMapper.selectMemberList(userId);
+        return new PageInfo<>(memberList);
     }
 
     @Override
@@ -163,7 +158,16 @@ public class UserServiceImpl implements UserService {
         return familyId;
     }
 
-    public void addMember(String memberId, String familyId, String memberName, String seniority, Integer role, String phone){
+    @Override
+    @Transactional
+    public void kickOut(String memberId) {
+        userMapper.kickOut(memberId);
+        userMapper.outFamily(memberId);
+    }
+
+
+    @Transactional
+    public void addMember(String memberId, String familyId, String memberName, String seniority, Integer role, String phone,String avatar){
         Member member = new Member();
         member.setMemberId(memberId);
         member.setFamilyId(familyId);
@@ -171,10 +175,10 @@ public class UserServiceImpl implements UserService {
         member.setSeniority(seniority);
         member.setRole(role);
         member.setPhone(phone);
+        member.setAvatar(avatar);
         userMapper.insertMember(member);
+        userMapper.haveFamily(memberId);
     }
-
-
 
 
 }

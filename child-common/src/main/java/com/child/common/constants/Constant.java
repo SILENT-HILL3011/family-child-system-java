@@ -30,9 +30,13 @@ public class Constant {
     public static final String SCHEDULE_REMIND = "日程提醒";
     public static final String TOMORROW_SCHEDULE = "明天日程：";
     public static final String SCHEDULE_TIME = "时间：";
-    public static final String EXPIRE_REMIND = "【即将开始！1小时后日程】";
 
-    public static final String REDIS_CHILD_INFO_KEY = "child:info:";       // 儿童详情
-    public static final String REDIS_CHILD_LIST_KEY = "child:list:";       // 儿童列表
-    public static final long CHILD_CACHE_EXPIRE_SECONDS = 86400;           // 1天过期
+    public static final String REDIS_CHILD_INFO_KEY = "child:info:";
+    public static final String REDIS_CHILD_LIST_KEY = "child:list:";
+    public static final long CHILD_CACHE_EXPIRE_SECONDS = 86400;
+
+    public static final String STATIC_PATH = "static/";
+    public static final String AVATAR_DIR = "avatar/";
+    public static final String ACCESS_PREFIX = "/file/avatar/";
+    public static final String THUMBNAIL_PREFIX = "thumb_";
 }

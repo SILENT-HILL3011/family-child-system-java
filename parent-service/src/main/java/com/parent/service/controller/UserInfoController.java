@@ -1,6 +1,7 @@
 package com.parent.service.controller;
 
 import com.child.common.annotation.GlobalInterceptor;
+import com.child.common.annotation.RequirePrimaryCaregiver;
 import com.child.common.constants.Constant;
 import com.child.common.entity.po.Member;
 import com.child.common.entity.po.User;
@@ -54,8 +55,9 @@ public class UserInfoController {
         return R.success(userService.updateUserInfo(user));
     }
 
-    @RequestMapping("/inviteMember")
+    @PostMapping("/inviteMember")
     @GlobalInterceptor(checkLogin = true)
+    @RequirePrimaryCaregiver
     public R inviteMember(@NotEmpty String phoneNumber,@NotEmpty String familyId,@NotEmpty String seniority,@NotNull Integer role){
         userService.inviteMember(phoneNumber,familyId,seniority,role);
         return R.success();
@@ -76,6 +78,16 @@ public class UserInfoController {
         String userId = redisComponent.getUserIdByToken(token);
         return R.success(userService.searchMemberList(userId,pageNum));
     }
+
+    @RequestMapping("/kickOut")
+    @GlobalInterceptor(checkLogin = true)
+    @RequirePrimaryCaregiver
+    public R kickOut(@NotEmpty String memberId){
+        userService.kickOut(memberId);
+        return R.success();
+    }
+
+
 
     @RequestMapping("/getFamilyId")
     @GlobalInterceptor(checkLogin = true)

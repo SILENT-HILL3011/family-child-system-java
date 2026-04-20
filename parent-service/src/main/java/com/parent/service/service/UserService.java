@@ -20,4 +20,6 @@ public interface UserService {
     PageInfo<Member> searchMemberList(String userId,Integer pageNum);
 
     String getFamilyId(String userId);
+
+    void kickOut(String memberId);
 }

@@ -23,6 +23,7 @@
         <easyExcel.version>3.3.2</easyExcel.version>
         <fastjson.version>2.0.32</fastjson.version>
         <hutool-version>5.8.23</hutool-version>
+        <thumbnailator.version>0.4.20</thumbnailator.version>
     </properties>
 
     <dependencies>
@@ -105,7 +106,16 @@
             <version>${hutool-version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>${thumbnailator.version}</version>
+        </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
     </dependencies>
 
 

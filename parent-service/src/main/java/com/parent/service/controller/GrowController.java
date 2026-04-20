@@ -127,7 +127,6 @@ public class GrowController {
     }
 
     @RequestMapping("/exportLive")
-//    @GlobalInterceptor(checkLogin = true)
     public void exportLive(@NotEmpty String childId, HttpServletResponse  response)throws Exception{
         System.out.println("后端收到的 childId：" + childId);
         childService.exportLive(childId, response);

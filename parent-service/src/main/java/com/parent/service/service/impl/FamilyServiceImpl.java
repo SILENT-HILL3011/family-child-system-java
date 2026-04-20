@@ -6,7 +6,6 @@ import com.child.common.entity.vo.MessageBoardVO;
 import com.child.common.exception.BusinessException;
 import com.child.common.utils.DateUtils;
 import com.child.common.utils.StringTools;
-import com.parent.service.annotation.CheckPrimaryCaregiverLimit;
 import com.parent.service.mapper.MessageMapper;
 import com.parent.service.mapper.TaskMapper;
 import com.parent.service.mapper.UserMapper;
@@ -79,18 +78,15 @@ public class FamilyServiceImpl implements FamilyService {
     @Override
     public List<TaskInfo> searchTask(@NotEmpty String familyId) {
         List<String> memberofRole = userMapper.selectMemberByRole(familyId);
-        String one = memberofRole.get(0);
-        String another = memberofRole.get(1);
-        List<TaskInfo> taskInfoList0 = taskMapper.selectByPublisherId(one);
-        List<TaskInfo> taskInfoList1 = taskMapper.selectByPublisherId(another);
-        List<TaskInfo> taskInfoList = new ArrayList<>();
-        taskInfoList.addAll(taskInfoList0);
-        taskInfoList.addAll(taskInfoList1);
-        if (taskInfoList.isEmpty()){
-            return new ArrayList<>();
+        List<TaskInfo> allTasks = new ArrayList<>();
+        for (String memberId : memberofRole) {
+            List<TaskInfo> tasks = taskMapper.selectByPublisherId(memberId);
+            if (tasks != null && !tasks.isEmpty()) {
+                allTasks.addAll(tasks);
+            }
         }
-        return taskInfoList.stream()
-                .filter(taskInfo -> taskInfo.getIsFinished().equals(Constant.NO))
+        return allTasks.stream()
+                .filter(task -> task.getIsFinished().equals(Constant.NO))
                 .collect(Collectors.toList());
     }
 
@@ -109,6 +105,7 @@ public class FamilyServiceImpl implements FamilyService {
         messageBoard.setPublishTime(new Date());
         messageBoard.setLikeCount(Constant.NUM_ZERO);
         messageBoard.setCommentCount(Constant.NUM_ZERO);
+        messageBoard.setAvatar(userMapper.getAvatarByUserId(publisherId));
         messageMapper.insertMessage(messageBoard);
     }
 
@@ -132,6 +129,7 @@ public class FamilyServiceImpl implements FamilyService {
             messageBoardVO.setPublishTime(messageBoard.getPublishTime());
             messageBoardVO.setLikeCount(messageBoard.getLikeCount());
             messageBoardVO.setCommentCount(messageBoard.getCommentCount());
+            messageBoardVO.setAvatar(messageBoard.getAvatar());
             messageBoardVOList.add(messageBoardVO);
         }
         return messageBoardVOList;
@@ -225,35 +223,13 @@ public class FamilyServiceImpl implements FamilyService {
     }
 
     @Override
-    @CheckPrimaryCaregiverLimit
     public void changeRole(String phoneNumber, Integer role) {
         Member member = userMapper.selectMemberByPhone(phoneNumber);
         member.setRole(role);
         userMapper.updateRole(member);
     }
 
-    private List<MessageBoardVO> searchMessage(String familyId, String publisherId, Integer timePeriod) {
-        if (timePeriod == null){
-            timePeriod = Constant.NUM_ONE;
-        }
-        if (timePeriod != 1 && timePeriod != 7 && timePeriod != 30) {
-            throw new BusinessException("时间段错误");
-        }
-        Member member = userMapper.selectFamilyByMemberId(publisherId);
-        Family family = userMapper.selectFamilyById(familyId);
-        List<MessageBoard> messageBoards = messageMapper.selectMessage(familyId, timePeriod);
-        List<MessageBoardVO> messageBoardVOList = new ArrayList<>();
-        for (MessageBoard messageBoard : messageBoards) {
-            MessageBoardVO messageBoardVO = new MessageBoardVO();
-            messageBoardVO.setMessageId(messageBoard.getMessageId());
-            messageBoardVO.setContent(messageBoard.getContent());
-            messageBoardVO.setPublishTime(messageBoard.getPublishTime());
-            messageBoardVO.setLikeCount(messageBoard.getLikeCount());
-            messageBoardVO.setCommentCount(messageBoard.getCommentCount());
-            messageBoardVOList.add(messageBoardVO);
-        }
-        return messageBoardVOList;
-    }
+
 
     @Scheduled(cron = "0 0 0 * * ?")
     public void autoFinishExpiredTask(){

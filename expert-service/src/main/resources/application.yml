@@ -7,7 +7,7 @@ spring:
       username: neo4j
       password: 301123gsw
   application:
-    name: parent-service
+    name: expert-service
   datasource:
     url: jdbc:mysql://192.168.150.101:3306/parent_service
     username: root
@@ -18,6 +18,10 @@ spring:
       database: 0
       host: 192.168.150.101
       port: 6379
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml

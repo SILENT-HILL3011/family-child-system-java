@@ -14,7 +14,7 @@ public interface ChildMapper {
     @Select("select * from child_info where child_name = #{childName} and family_id = #{familyId}")
     Child selectByNameAndFamilyId(String childName, String familyId);
 
-    @Insert("insert into child_info(child_id, child_name, family_id, sex,idnumber,birthdate) values(#{childId},#{childName},#{familyId},#{sex},#{idNumber},#{birthDate})")
+    @Insert("insert into child_info(child_id, child_name, family_id, sex,idnumber,birthdate,age) values(#{childId},#{childName},#{familyId},#{sex},#{idNumber},#{birthDate},#{age})")
     void insert(Child child);
 
     @Select("select * from child_info where child_id = #{childId}")

@@ -23,6 +23,10 @@ spring:
     authentication:
       username: neo4j
       password: 301123gsw
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml

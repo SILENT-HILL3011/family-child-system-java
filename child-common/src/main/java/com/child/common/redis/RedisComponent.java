@@ -78,14 +78,11 @@ public class RedisComponent {
         redisUtils.deleteByPattern(Constant.REDIS_CHILD_LIST_KEY + "*");
     }
 
-    // ===================== 登录失败锁定IP相关 =====================
-// 保存登录失败次数（10分钟）
     public void saveLoginFailCount(String ip, int count) {
         String key = "login:fail:" + ip;
         redisUtils.setEx(key, String.valueOf(count), 10 * 60); // 10分钟
     }
 
-    // 获取登录失败次数
     public int getLoginFailCount(String ip) {
         String key = "login:fail:" + ip;
         String countStr = redisUtils.get(key);

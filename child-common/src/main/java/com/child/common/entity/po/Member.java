@@ -7,6 +7,15 @@ public class Member {
     private String seniority;
     private Integer role;
     private String phone;
+    private String avatar;
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
 
     public String getPhone() {
         return phone;

@@ -21,7 +21,6 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URLEncoder;
 import java.time.LocalDate;
@@ -42,13 +41,10 @@ public class ChildServiceImpl implements ChildService {
     private DailyTimeMapper dailyTimeMapper;
     @Resource
     private GrowthTrendMapper growthTrendMapper;
-    @Value("${file.upload-path}")
-    private String uploadPath;
     @Resource
     private RedisComponent redisComponent;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void addChild(String familyId, String childName, Integer sex,String idNumber,String birthDate) {
         Family checkIsExist = userMapper.selectFamilyById(familyId);
         if (checkIsExist == null){
@@ -65,7 +61,9 @@ public class ChildServiceImpl implements ChildService {
         child.setFamilyId(familyId);
         child.setIdNumber(idNumber);
         child.setBirthDate(DateUtils.ChangeStr2Date(birthDate));
+        child.setAge(DateUtils.getAge(birthDate));
         childMapper.insert(child);
+        redisComponent.saveChildInfo(child.getChildId(), JSON.toJSONString(child));
     }
 
     @Override
@@ -164,10 +162,7 @@ public class ChildServiceImpl implements ChildService {
 
     @Override
     public Examination appointExamination(String childId, String doctorId,String startTime) {
-        Examination examination = childMapper.selectExaminationByDoctorId(doctorId);
-        if (examination == null){
-            return null;
-        }
+
         Examination newExamination = new Examination();
         newExamination.setExaminationId(StringTools.getRandomNumber(Constant.LENGTH_12));
         newExamination.setChildId(childId);
@@ -248,15 +243,11 @@ public class ChildServiceImpl implements ChildService {
             e.setRecordTime(d.getRecordTime() == null ? "" : d.getRecordTime().toString());
             excelList.add(e);
         }
-
-        // ====================== 核心：正确响应头 ======================
         response.reset(); // 清空所有之前的响应
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setCharacterEncoding("UTF-8");
         String fileName = URLEncoder.encode("生活记录", "UTF-8");
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
-
-        // 3. 写出 Excel
         EasyExcel.write(response.getOutputStream(), DailyTimeExcel.class)
                 .sheet("生活记录")
                 .doWrite(excelList);
@@ -373,8 +364,6 @@ public class ChildServiceImpl implements ChildService {
     private boolean isVaccineDone(VaccineRecord record, ChildVaccineEnum vaccineEnum) {
         String name = vaccineEnum.name();
         int needTimes = getNeedTimes(vaccineEnum);
-
-        // 按疫苗类型判断已接种次数 >= 需要针次
         if (name.startsWith("HBV")) {
             return getValue(record.getHBVTimes()) >= needTimes;
         }
@@ -451,7 +440,6 @@ public class ChildServiceImpl implements ChildService {
                 record.setDTLastTime(inoculateTime);
                 break;
             case "AC群流脑":
-                // 注：原PO中AC群流脑字段复用了GACPV，需确认是否新增字段，此处先复用
                 record.setGACPVTimes(needleNum);
                 record.setGACPVLastTime(inoculateTime);
                 break;

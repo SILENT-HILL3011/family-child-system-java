@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface MessageMapper {
 
-    @Insert("insert into message_board(message_id,family_id,publisher_id,content,image_url,publish_time,like_count,comment_count) values(#{messageId},#{familyId},#{publisherId},#{content},#{imageUrl},#{publishTime},#{likeCount},#{commentCount})")
+    @Insert("insert into message_board(message_id,family_id,publisher_id,content,image_url,publish_time,like_count,comment_count,avatar) values(#{messageId},#{familyId},#{publisherId},#{content},#{imageUrl},#{publishTime},#{likeCount},#{commentCount},#{avatar})")
     void insertMessage(MessageBoard messageBoard);
 
     List<MessageBoard> selectMessage(String familyId,  Integer timePeriod);
