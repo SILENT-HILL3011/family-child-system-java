@@ -41,4 +41,16 @@ public interface ChildService {
     List<GrowthTrend> searchGrowth(String childId, Integer days);
 
     List<Examination> loadExamination();
+
+    void deleteChild(String childId);
+
+    void deleteGrowthRecord(String id);
+
+    void cancelExamination(String examinationId);
+
+    void deleteLiveRecord(String dailyId);
+
+    void updateFood(String childId, String recordTime, Integer time, String food);
+
+    void updateSleep(String childId, String recordTime, Integer time, Integer sleepTime);
 }

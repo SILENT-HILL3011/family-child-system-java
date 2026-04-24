@@ -1,6 +1,7 @@
 package com.parent.service.mapper;
 
 import com.child.common.entity.po.GrowthTrend;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 
 import java.sql.Date;
@@ -20,4 +21,7 @@ public interface GrowthTrendMapper {
             @Param("startDate") java.sql.Date startDate,
             @Param("endDate") java.sql.Date endDate
     );
+
+    @Delete("delete from growth_trend where id = #{id}")
+    void deleteById(String id);
 }

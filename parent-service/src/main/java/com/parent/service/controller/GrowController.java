@@ -1,6 +1,7 @@
 package com.parent.service.controller;
 
 import com.child.common.annotation.GlobalInterceptor;
+import com.child.common.entity.enums.DailyTimeEnum;
 import com.child.common.entity.po.*;
 import com.child.common.entity.vo.ChildInfoVO;
 import com.child.common.entity.vo.ResponseCodeEnum;
@@ -55,6 +56,13 @@ public class GrowController {
         return R.success();
     }
 
+    @RequestMapping("/deleteChild")
+    @GlobalInterceptor(checkLogin = true)
+    public R deleteChild(@NotEmpty String childId){
+        childService.deleteChild(childId);
+        return R.success();
+    }
+
     @RequestMapping("/recordGrowth")
     @GlobalInterceptor(checkLogin = true)
     public R recordGrowth(@RequestBody GrowthTrend growthTrend){
@@ -67,6 +75,13 @@ public class GrowController {
     public R<List<GrowthTrend>> searchGrowth(@NotEmpty String childId,Integer days){
         List<GrowthTrend> growthTrends = childService.searchGrowth(childId, days);
         return R.success(growthTrends);
+    }
+
+    @RequestMapping("/deleteGrowthRecord")
+    @GlobalInterceptor(checkLogin = true)
+    public R deleteGrowthRecord(@NotEmpty String id){
+        childService.deleteGrowthRecord(id);
+        return R.success();
     }
 
 
@@ -104,16 +119,24 @@ public class GrowController {
         return R.success(childService.loadExamination());
     }
 
+    @RequestMapping("/cancelExamination")
+    @GlobalInterceptor(checkLogin = true)
+    public R cancelExamination(@NotEmpty String examinationId){
+        childService.cancelExamination(examinationId);
+        return R.success();
+    }
+
 
 
 
     @RequestMapping("/recordLive")
     @GlobalInterceptor(checkLogin = true)
-    public R recordLive(@NotEmpty String childId,@NotNull Integer time,String food,Integer sleepTime){
-        if (time == 1 || time == 2 || time == 4){
-            childService.recordFood(childId,time,food);
-        } else if (time == 3 || time == 5){
-            childService.recordSleep(childId,time,sleepTime);
+    public R recordLive(@NotEmpty String childId,@NotEmpty String time,String food,Integer sleepTime){
+        Integer timeCode = DailyTimeEnum.getCodeByTime(time);
+        if (timeCode == 1 || timeCode == 2 || timeCode == 4){
+            childService.recordFood(childId,timeCode,food);
+        } else if (timeCode == 3 || timeCode == 5){
+            childService.recordSleep(childId,timeCode,sleepTime);
         } else {
             throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
@@ -126,9 +149,29 @@ public class GrowController {
         return R.success(childService.searchLive(childId,pageNum));
     }
 
+    @RequestMapping("/updateLiveRecord")
+    @GlobalInterceptor(checkLogin = true)
+    public R updateLiveRecord(@NotEmpty String childId,@NotEmpty String recordTime,@NotNull Integer time,String food,Integer sleepTime){
+        if (time == 1 || time == 2 || time == 4) {
+            childService.updateFood(childId, recordTime, time, food);
+        } else if (time == 3 || time == 5) {
+            childService.updateSleep(childId, recordTime, time, sleepTime);
+        } else {
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        return R.success();
+    }
+
+    @RequestMapping("/deleteLiveRecord")
+    @GlobalInterceptor(checkLogin = true)
+    public R deleteLiveRecord(@NotEmpty String dailyId){
+        childService.deleteLiveRecord(dailyId);
+        return R.success();
+    }
+
+
     @RequestMapping("/exportLive")
     public void exportLive(@NotEmpty String childId, HttpServletResponse  response)throws Exception{
-        System.out.println("后端收到的 childId：" + childId);
         childService.exportLive(childId, response);
     }
 

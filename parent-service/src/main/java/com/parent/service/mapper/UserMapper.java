@@ -67,4 +67,7 @@ public interface UserMapper {
 
     @Delete("delete from member_info where member_id = #{userId}")
     void kickOut(String userId);
+
+    @Select("select * from member_info where member_id = #{userId}")
+    Member selectMemberByUserId(String userId);
 }

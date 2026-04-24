@@ -5,7 +5,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
 public class DailyTimeExcel {
 
     @ExcelProperty(value = "记录类型", index = 0)
-    private String time;
+    private Integer time;
 
     @ExcelProperty(value = "饮食内容", index = 1)
     private String food;
@@ -16,11 +16,11 @@ public class DailyTimeExcel {
     @ExcelProperty(value = "记录时间", index = 3)
     private String recordTime;
 
-    public String getTime() {
+    public Integer getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(Integer time) {
         this.time = time;
     }
 

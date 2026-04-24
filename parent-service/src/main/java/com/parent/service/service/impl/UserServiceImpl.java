@@ -92,6 +92,9 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new BusinessException("用户不存在");
         }
+        if (user.getHaveFamily() == 1){
+            throw new BusinessException("用户已加入家庭");
+        }
         addMember(user.getUserId(),familyId,user.getUserName(),seniority, role,user.getPhoneNumber(),user.getAvatar());
     }
 
@@ -149,13 +152,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String getFamilyId(String userId) {
-        User user = userMapper.selectById(userId);
-        String userName = user.getUserName();
-        String familyId = userMapper.selectFamilyIdByName(userName);
-        if (familyId == null){
-            return null;
-        }
-        return familyId;
+        Member member = userMapper.selectMemberByUserId(userId);
+        return member == null ? null : member.getFamilyId();
     }
 
     @Override

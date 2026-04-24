@@ -4,7 +4,9 @@ import com.child.common.entity.po.Child;
 import com.child.common.entity.po.Examination;
 import com.child.common.entity.po.VaccineRecord;
 import com.child.common.entity.vo.ChildInfoVO;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.time.LocalDateTime;
@@ -44,4 +46,27 @@ public interface ChildMapper {
 
 
     List<Examination> selectAvailableExamination(LocalDateTime now);
+
+    @Delete("delete from child_info where child_id = #{childId}")
+    void deleteById(String childId);
+
+    @Delete("delete from personal_examination_record where examination_id = #{examinationId}")
+    void deleteExamination(String examinationId);
+
+    @Select("select child_id,age from child_info")
+    List<Child> selectChildIds();
+
+    void updateFood(
+            @Param("childId") String childId,
+            @Param("recordTime") String recordTime,
+            @Param("time") Integer time,
+            @Param("food") String food
+    );
+
+    void updateSleep(
+            @Param("childId") String childId,
+            @Param("recordTime") String recordTime,
+            @Param("time") Integer time,
+            @Param("sleepTime") Integer sleepTime
+    );
 }

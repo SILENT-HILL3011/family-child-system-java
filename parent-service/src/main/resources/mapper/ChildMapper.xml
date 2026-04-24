@@ -70,4 +70,22 @@
         )
     </select>
 
+    <update id="updateFood">
+        UPDATE daily_time
+        SET time = #{time},
+            food = #{food},
+            sleep_time = NULL
+        WHERE child_id = #{childId}
+          AND DATE_FORMAT(record_time, '%Y-%m-%d %H:%i:%s') = #{recordTime}
+    </update>
+
+    <update id="updateSleep">
+        UPDATE daily_time
+        SET time = #{time},
+            sleep_time = #{sleepTime},
+            food = NULL
+        WHERE child_id = #{childId}
+          AND DATE_FORMAT(record_time, '%Y-%m-%d %H:%i:%s') = #{recordTime}
+    </update>
+
 </mapper>

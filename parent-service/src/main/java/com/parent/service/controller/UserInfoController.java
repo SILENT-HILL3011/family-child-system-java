@@ -87,8 +87,6 @@ public class UserInfoController {
         return R.success();
     }
 
-
-
     @RequestMapping("/getFamilyId")
     @GlobalInterceptor(checkLogin = true)
     public R<String> getFamilyId(){

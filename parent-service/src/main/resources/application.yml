@@ -33,7 +33,7 @@ mybatis:
   type-aliases-package: com.parent.service.mapper
   configuration:
     map-underscore-to-camel-case: true
-    
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 pagehelper:
   helperDialect: mysql
   reasonable: true
@@ -41,3 +41,6 @@ pagehelper:
   params: count=countSql
 file:
   upload-path: E:/child/
+logging:
+  level:
+    com.parent.service.mapper: debug

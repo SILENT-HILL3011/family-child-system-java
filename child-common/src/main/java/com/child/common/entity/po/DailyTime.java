@@ -4,11 +4,20 @@ import java.util.Date;
 
 public class DailyTime {
 
+    private String dailyId;
     private String childId;
-    private String time;
+    private Integer time;
     private String food;
     private Date recordTime;
     private Integer sleepTime;
+
+    public String getDailyId() {
+        return dailyId;
+    }
+
+    public void setDailyId(String dailyId) {
+        this.dailyId = dailyId;
+    }
 
     public String getChildId() {
         return childId;
@@ -18,11 +27,11 @@ public class DailyTime {
         this.childId = childId;
     }
 
-    public String getTime() {
+    public Integer getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(Integer time) {
         this.time = time;
     }
 

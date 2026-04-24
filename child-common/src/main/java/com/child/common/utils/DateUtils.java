@@ -77,7 +77,22 @@ public class DateUtils {
     }
 
 
-    public static Integer getAge(String birthDate) {
+    public static Integer getAgeFromBirthDate(String birthDate) {
+        Date birthdate = ChangeStr2Date(birthDate);
+        if (birthdate == null) {
+            return null;
+        }
+        Calendar birth = Calendar.getInstance();
+        birth.setTime(birthdate);
+        Calendar now = Calendar.getInstance();
+        now.setTime(new Date());
+        int month = (now.get(Calendar.YEAR) - birth.get(Calendar.YEAR)) * 12;
+        month += now.get(Calendar.MONTH) - birth.get(Calendar.MONTH);
+        return month;
+    }
+
+    public static Integer getAgeFromIDNumber(String idNumber){
+        String birthDate = idNumber.substring(6, 14);
         Date birthdate = ChangeStr2Date(birthDate);
         if (birthdate == null) {
             return null;

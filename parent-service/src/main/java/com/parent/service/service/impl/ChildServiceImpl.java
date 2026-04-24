@@ -19,7 +19,6 @@ import com.parent.service.mapper.*;
 import com.parent.service.service.ChildService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;
@@ -61,7 +60,7 @@ public class ChildServiceImpl implements ChildService {
         child.setFamilyId(familyId);
         child.setIdNumber(idNumber);
         child.setBirthDate(DateUtils.ChangeStr2Date(birthDate));
-        child.setAge(DateUtils.getAge(birthDate));
+        child.setAge(DateUtils.getAgeFromBirthDate(birthDate));
         childMapper.insert(child);
         redisComponent.saveChildInfo(child.getChildId(), JSON.toJSONString(child));
     }
@@ -96,6 +95,17 @@ public class ChildServiceImpl implements ChildService {
         check.setRecordDate(new Date());
         childMapper.update(check);
         redisComponent.saveChildInfo(child.getChildId(), JSON.toJSONString(check));
+        redisComponent.clearChildListCache();
+    }
+
+    @Override
+    public void deleteChild(String childId) {
+        Child child = childMapper.selectById(childId);
+        if (child == null){
+            throw new BusinessException("儿童不存在");
+        }
+        childMapper.deleteById(childId);
+        redisComponent.deleteChildInfo(childId);
         redisComponent.clearChildListCache();
     }
 
@@ -176,8 +186,9 @@ public class ChildServiceImpl implements ChildService {
     @Override
     public void recordFood(String childId, Integer time, String food) {
         DailyTime dailyTime = new DailyTime();
+        dailyTime.setDailyId(StringTools.getRandomNumber(Constant.LENGTH_12));
         dailyTime.setChildId(childId);
-        dailyTime.setTime(TimePerEnum.getDescByCode(time));
+        dailyTime.setTime(time);
         dailyTime.setFood(food);
         dailyTime.setRecordTime(new Date());
         dailyTimeMapper.insert4Food(dailyTime);
@@ -186,8 +197,9 @@ public class ChildServiceImpl implements ChildService {
     @Override
     public void recordSleep(String childId, Integer time, Integer sleepTime) {
         DailyTime dailyTime = new DailyTime();
+        dailyTime.setDailyId(StringTools.getRandomNumber(Constant.LENGTH_12));
         dailyTime.setChildId(childId);
-        dailyTime.setTime(TimePerEnum.getDescByCode(time));
+        dailyTime.setTime(time);
         dailyTime.setSleepTime(sleepTime);
         dailyTime.setRecordTime(new Date());
         dailyTimeMapper.insert4Sleep(dailyTime);
@@ -233,7 +245,6 @@ public class ChildServiceImpl implements ChildService {
         PageInfo<DailyTime> pageInfo = searchLive(childId, 9999);
         List<DailyTime> dataList = pageInfo.getList();
 
-        // 2. 转换为 Excel 实体
         List<DailyTimeExcel> excelList = new ArrayList<>();
         for (DailyTime d : dataList) {
             DailyTimeExcel e = new DailyTimeExcel();
@@ -351,6 +362,31 @@ public class ChildServiceImpl implements ChildService {
     public List<Examination> loadExamination() {
         LocalDateTime now = LocalDateTime.now();
         return childMapper.selectAvailableExamination(now);
+    }
+
+    @Override
+    public void deleteGrowthRecord(String id) {
+        growthTrendMapper.deleteById(id);
+    }
+
+    @Override
+    public void cancelExamination(String examinationId) {
+        childMapper.deleteExamination(examinationId);
+    }
+
+    @Override
+    public void updateFood(String childId, String recordTime, Integer time, String food) {
+        childMapper.updateFood(childId, recordTime, time, food);
+    }
+
+    @Override
+    public void updateSleep(String childId, String recordTime, Integer time, Integer sleepTime) {
+        childMapper.updateSleep(childId, recordTime, time, sleepTime);
+    }
+
+    @Override
+    public void deleteLiveRecord(String dailyId) {
+        dailyTimeMapper.deleteLiveRecord(dailyId);
     }
 
     private int getValue(Integer num) {
