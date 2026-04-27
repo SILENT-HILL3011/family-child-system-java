@@ -1,15 +1,15 @@
 package com.parent.service.mapper;
 
+import com.child.common.entity.po.AppointExamination;
 import com.child.common.entity.po.Child;
 import com.child.common.entity.po.Examination;
 import com.child.common.entity.po.VaccineRecord;
 import com.child.common.entity.vo.ChildInfoVO;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import com.child.common.entity.vo.ExaminationVO;
+import org.apache.ibatis.annotations.*;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 public interface ChildMapper {
@@ -38,10 +38,11 @@ public interface ChildMapper {
     @Select("select * from personal_examination_record where doctor_id = #{doctorId}")
     Examination selectExaminationByDoctorId(String doctorId);
 
-    @Insert("insert into personal_examination_record(child_id,ischecked,doctor_id,examination_id,start_time) values(#{childId},#{isChecked},#{doctorId},#{examinationId},#{startTime})")
+    @Update("update personal_examination_record " +
+            "set booked_child_ids = #{bookedChildIds} " +
+            "where examination_id = #{examinationId}")
     void updateExamination(Examination examination);
 
-    @Select("select family_id,child_id,child_name,sex,age,idnumber from child_info where family_id = #{familyId}")
     List<ChildInfoVO> selectChildInfo(String familyId);
 
 
@@ -50,8 +51,8 @@ public interface ChildMapper {
     @Delete("delete from child_info where child_id = #{childId}")
     void deleteById(String childId);
 
-    @Delete("delete from personal_examination_record where examination_id = #{examinationId}")
-    void deleteExamination(String examinationId);
+    @Delete("delete from examination_appoint where appoint_id = #{appointId}")
+    void deleteExamination(String appointId);
 
     @Select("select child_id,age from child_info")
     List<Child> selectChildIds();
@@ -69,4 +70,21 @@ public interface ChildMapper {
             @Param("time") Integer time,
             @Param("sleepTime") Integer sleepTime
     );
+
+    @Select("select * from personal_examination_record where examination_id = #{examinationId}")
+    Examination selectExamById(String examinationId);
+
+    @Select("select * from examination_appoint where examination_id = #{examinationId}")
+    AppointExamination selectAppointByExamId(String examinationId);
+
+
+    @Insert("INSERT INTO examination_appoint " +
+            "(appoint_id, child_id, examination_id, appoint_time) " +
+            "VALUES (#{appointId}, #{childId}, #{examinationId}, #{appointTime})")
+    void insertAppoint(AppointExamination appointmentExamination);
+
+    List<ExaminationVO> findMyExamination(@Param("familyId") String familyId);
+
+    @Select("select * from examination_appoint where examination_id = #{examinationId}")
+    List<AppointExamination> selectAppointExamination(String examinationId);
 }

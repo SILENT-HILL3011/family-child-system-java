@@ -1,7 +1,9 @@
 package com.parent.service.service;
 
 import com.child.common.entity.po.*;
+import com.child.common.entity.vo.AvailableTimeVO;
 import com.child.common.entity.vo.ChildInfoVO;
+import com.child.common.entity.vo.ExaminationVO;
 import com.github.pagehelper.PageInfo;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -19,7 +21,7 @@ public interface ChildService {
 
     List<String> searchVaccineThisYear(String childId);
 
-    Examination appointExamination(String childId, String doctorId,String startTime);
+    Examination appointExamination(String childId, String examinationId, String startTime);
 
     void recordFood(String childId, Integer time, String food);
 
@@ -27,7 +29,7 @@ public interface ChildService {
 
     PageInfo<DailyTime> searchLive(String childId,Integer pageNum);
 
-    PageInfo<ChildInfoVO> searchChildInfo(String familyId, Integer pageNum);
+    List<ChildInfoVO> searchChildInfo(String familyId);
 
     Child searchChildById(String childId);
 
@@ -46,11 +48,17 @@ public interface ChildService {
 
     void deleteGrowthRecord(String id);
 
-    void cancelExamination(String examinationId);
+    void cancelExamination(String appointId);
 
     void deleteLiveRecord(String dailyId);
 
     void updateFood(String childId, String recordTime, Integer time, String food);
 
     void updateSleep(String childId, String recordTime, Integer time, Integer sleepTime);
+
+    void updateGrowthTrend(GrowthTrend growthTrend);
+
+    List<ExaminationVO> findMyExamination(String familyId);
+
+    List<AvailableTimeVO> loadFreeTime(String examinationId);
 }

@@ -4,6 +4,7 @@ public class ChildInfoVO {
 
     private String childId;
     private String familyId;
+    private String familyName;
     private String childName;
     private Integer sex;
     private Integer age;
@@ -23,6 +24,14 @@ public class ChildInfoVO {
 
     public void setFamilyId(String familyId) {
         this.familyId = familyId;
+    }
+
+    public String getFamilyName() {
+        return familyName;
+    }
+
+    public void setFamilyName(String familyName) {
+        this.familyName = familyName;
     }
 
     public Integer getSex() {

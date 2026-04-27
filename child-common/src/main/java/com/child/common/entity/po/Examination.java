@@ -6,18 +6,28 @@ public class Examination {
 
     private String examinationId;
     private String doctorId;
+    private String doctorName;
     private String childId;
-    private Integer isChecked;
     private Date startTime;
     private Date endTime;
+    private String bookedChildIds;
 
-    public Integer getIsChecked() {
-        return isChecked;
+    public String getBookedChildIds() {
+        return bookedChildIds;
     }
 
-    public void setIsChecked(Integer isChecked) {
-        this.isChecked = isChecked;
+    public void setBookedChildIds(String bookedChildIds) {
+        this.bookedChildIds = bookedChildIds;
     }
+
+    public String getDoctorName() {
+        return doctorName;
+    }
+
+    public void setDoctorName(String doctorName) {
+        this.doctorName = doctorName;
+    }
+
 
     public Date getEndTime() {
         return endTime;
@@ -35,13 +45,6 @@ public class Examination {
         this.startTime = startTime;
     }
 
-    public Integer getChecked() {
-        return isChecked;
-    }
-
-    public void setChecked(Integer checked) {
-        isChecked = checked;
-    }
 
     public String getExaminationId() {
         return examinationId;

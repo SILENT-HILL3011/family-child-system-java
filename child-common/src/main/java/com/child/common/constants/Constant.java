@@ -23,6 +23,7 @@ public class Constant {
 
     public static final Integer NUM_ZERO = 0;
     public static final Integer NUM_ONE = 1;
+    public static final Integer DAYS_OF_WEEK = 7;
 
 
 

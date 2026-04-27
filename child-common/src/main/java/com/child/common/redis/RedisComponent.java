@@ -64,13 +64,13 @@ public class RedisComponent {
         redisUtils.delete(key);
     }
 
-    public void saveChildList(String familyId, Integer pageNum, String listJson) {
-        String key = Constant.REDIS_CHILD_LIST_KEY + familyId + ":" + pageNum;
+    public void saveChildList(String familyId, String listJson) {
+        String key = Constant.REDIS_CHILD_LIST_KEY + familyId;
         redisUtils.setEx(key, listJson, Constant.CHILD_CACHE_EXPIRE_SECONDS);
     }
 
-    public String getChildList(String familyId, Integer pageNum) {
-        String key = Constant.REDIS_CHILD_LIST_KEY + familyId + ":" + pageNum;
+    public String getChildList(String familyId) {
+        String key = Constant.REDIS_CHILD_LIST_KEY + familyId;
         return redisUtils.get(key);
     }
 

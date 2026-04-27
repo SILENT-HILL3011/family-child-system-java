@@ -106,4 +106,22 @@ public class DateUtils {
         return month;
     }
 
+    public static int getHourDiff(Date start,Date end){
+        if (start == null || end == null){
+            return 0;
+        }
+        long startTime = start.getTime();
+        long endTime = end.getTime();
+        return (int) ((endTime - startTime) / (1000 * 60 * 60));
+    }
+
+    public static int getHour(Date date){
+        if (date == null){
+            return 0;
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar.get(Calendar.HOUR_OF_DAY);
+    }
+
 }

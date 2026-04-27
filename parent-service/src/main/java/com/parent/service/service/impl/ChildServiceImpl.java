@@ -1,12 +1,16 @@
 package com.parent.service.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
 import com.child.common.constants.Constant;
 import com.child.common.entity.enums.ChildVaccineEnum;
 import com.child.common.entity.enums.TimePerEnum;
 import com.child.common.entity.po.*;
+import com.child.common.entity.vo.AvailableTimeVO;
 import com.child.common.entity.vo.ChildInfoVO;
+import com.child.common.entity.vo.ExaminationVO;
 import com.child.common.entity.vo.ResponseCodeEnum;
 import com.child.common.exception.BusinessException;
 import com.child.common.redis.RedisComponent;
@@ -19,9 +23,12 @@ import com.parent.service.mapper.*;
 import com.parent.service.service.ChildService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -30,6 +37,7 @@ import java.util.stream.Collectors;
 @Service
 public class ChildServiceImpl implements ChildService {
 
+    private static final Logger log = LoggerFactory.getLogger(ChildServiceImpl.class);
     @Resource
     private UserMapper userMapper;
     @Resource
@@ -44,13 +52,13 @@ public class ChildServiceImpl implements ChildService {
     private RedisComponent redisComponent;
 
     @Override
-    public void addChild(String familyId, String childName, Integer sex,String idNumber,String birthDate) {
+    public void addChild(String familyId, String childName, Integer sex, String idNumber, String birthDate) {
         Family checkIsExist = userMapper.selectFamilyById(familyId);
-        if (checkIsExist == null){
+        if (checkIsExist == null) {
             throw new BusinessException("家庭不存在");
         }
-        Child check = childMapper.selectByNameAndFamilyId(childName,familyId);
-        if (check != null){
+        Child check = childMapper.selectByNameAndFamilyId(childName, familyId);
+        if (check != null) {
             throw new BusinessException("儿童不存在");
         }
         Child child = new Child();
@@ -68,28 +76,28 @@ public class ChildServiceImpl implements ChildService {
     @Override
     public void updateChildInfo(Child child) {
         Child check = childMapper.selectById(child.getChildId());
-        if (check == null){
+        if (check == null) {
             throw new BusinessException("儿童不存在");
         }
-        if (child.getChineseWordCount() != null){
+        if (child.getChineseWordCount() != null) {
             check.setChineseWordCount(child.getChineseWordCount());
         }
-        if (child.getEnglishWordCount() != null){
+        if (child.getEnglishWordCount() != null) {
             check.setEnglishWordCount(child.getEnglishWordCount());
         }
-        if (child.getPoetryCount() != null){
+        if (child.getPoetryCount() != null) {
             check.setPoetryCount(child.getPoetryCount());
         }
-        if (child.getHeight() != null){
+        if (child.getHeight() != null) {
             check.setHeight(child.getHeight());
         }
-        if (child.getWeight() != null){
+        if (child.getWeight() != null) {
             check.setWeight(child.getWeight());
         }
-        if (child.getHeadCirc() != null){
+        if (child.getHeadCirc() != null) {
             check.setHeadCirc(child.getHeadCirc());
         }
-        if (child.getAge() != null){
+        if (child.getAge() != null) {
             check.setAge(child.getAge());
         }
         check.setRecordDate(new Date());
@@ -101,7 +109,7 @@ public class ChildServiceImpl implements ChildService {
     @Override
     public void deleteChild(String childId) {
         Child child = childMapper.selectById(childId);
-        if (child == null){
+        if (child == null) {
             throw new BusinessException("儿童不存在");
         }
         childMapper.deleteById(childId);
@@ -112,11 +120,11 @@ public class ChildServiceImpl implements ChildService {
     @Override
     public VaccineRecord searchVaccine(String childId) {
         Child child = childMapper.selectById(childId);
-        if (child == null){
+        if (child == null) {
             throw new BusinessException(ResponseCodeEnum.CODE_602);
         }
         Child newChild = childMapper.selectChildFromVaccineRecord(childId);
-        if (newChild == null){
+        if (newChild == null) {
             childMapper.insertVaccineRecord(childId);
             return null;
         }
@@ -126,7 +134,7 @@ public class ChildServiceImpl implements ChildService {
     @Override
     public void updateVaccine(String childId, String vaccine) {
         Optional<ChildVaccineEnum> vaccineEnumOpt = ChildVaccineUtil.getEnumByVaccineDesc(vaccine);
-        if (vaccineEnumOpt.isEmpty()){
+        if (vaccineEnumOpt.isEmpty()) {
             throw new BusinessException("未匹配到对应的疫苗类型：" + vaccine);
         }
         VaccineRecord record = vaccineRecordMapper.selectByChildId(childId);
@@ -136,8 +144,8 @@ public class ChildServiceImpl implements ChildService {
         }
         Date now = new Date();
         String vaccineType = ChildVaccineUtil.getVaccineTypeFromDesc(vaccine);
-        Integer needleNum = ChildVaccineUtil.getNeedleNumFromDesc(vaccine) ;
-        updateRecordByVaccineType(record,vaccineType,needleNum,now);
+        Integer needleNum = ChildVaccineUtil.getNeedleNumFromDesc(vaccine);
+        updateRecordByVaccineType(record, vaccineType, needleNum, now);
         if (record.getChildId() != null && vaccineRecordMapper.selectByChildId(childId) != null) {
             vaccineRecordMapper.updateByChildId(record);
         } else {
@@ -148,7 +156,7 @@ public class ChildServiceImpl implements ChildService {
     @Override
     public List<String> searchVaccineThisYear(String childId) {
         Child child = childMapper.selectById(childId);
-        if (child == null){
+        if (child == null) {
             throw new BusinessException(ResponseCodeEnum.CODE_602);
         }
         Integer ageByMonth = child.getAge();
@@ -170,17 +178,24 @@ public class ChildServiceImpl implements ChildService {
         return result;
     }
 
-    @Override
-    public Examination appointExamination(String childId, String doctorId,String startTime) {
 
-        Examination newExamination = new Examination();
-        newExamination.setExaminationId(StringTools.getRandomNumber(Constant.LENGTH_12));
-        newExamination.setChildId(childId);
-        newExamination.setChecked(Constant.IS);
-        newExamination.setDoctorId(doctorId);
-        newExamination.setStartTime(DateUtils.ChangeStr2Date(startTime));
-        childMapper.updateExamination(newExamination);
-        return newExamination;
+    @Override
+    public Examination appointExamination(String childId, String examinationId, String startTime) {
+        Examination examination = childMapper.selectExamById(examinationId);
+        if (examination == null) {
+            throw new BusinessException("体检不存在");
+        }
+        AppointExamination appointment = childMapper.selectAppointByExamId(examinationId);
+        if (appointment != null) {
+            throw new BusinessException("该体检已预约");
+        }
+        AppointExamination appointmentExamination = new AppointExamination();
+        appointmentExamination.setAppointId(StringTools.getRandomNumber(Constant.LENGTH_12));
+        appointmentExamination.setChildId(childId);
+        appointmentExamination.setExaminationId(examinationId);
+        appointmentExamination.setAppointTime(DateUtils.ChangeStr2DateTime(startTime));
+        childMapper.insertAppoint(appointmentExamination);
+        return examination;
     }
 
     @Override
@@ -206,8 +221,8 @@ public class ChildServiceImpl implements ChildService {
     }
 
     @Override
-    public PageInfo<DailyTime> searchLive(String childId,Integer pageNum) {
-        if (pageNum == null){
+    public PageInfo<DailyTime> searchLive(String childId, Integer pageNum) {
+        if (pageNum == null) {
             pageNum = Constant.NUM_ONE;
         }
         List<DailyTime> dailyTimeListOfWeek = dailyTimeMapper.selectWeeklyRecordsByChildId(childId);
@@ -216,32 +231,29 @@ public class ChildServiceImpl implements ChildService {
     }
 
     @Override
-    public PageInfo<ChildInfoVO> searchChildInfo(String familyId, Integer pageNum) {
-        if (pageNum == null){
-            pageNum = Constant.NUM_ONE;
-        }
-        String json = redisComponent.getChildList(familyId, pageNum);
+    public List<ChildInfoVO> searchChildInfo(String familyId) {
+
+        String json = redisComponent.getChildList(familyId);
         if (json != null) {
-            return JSON.parseObject(json, PageInfo.class);
+            return JSON.parseObject(json, new TypeReference<List<ChildInfoVO>>() {
+            });
         }
         List<ChildInfoVO> childInfoVOList = childMapper.selectChildInfo(familyId);
-        PageHelper.startPage(pageNum, 10);
-        PageInfo<ChildInfoVO> pageInfo = new PageInfo<>(childInfoVOList);
-        redisComponent.saveChildList(familyId, pageNum, JSON.toJSONString(pageInfo));
-        return pageInfo;
+        redisComponent.saveChildList(familyId, JSON.toJSONString(childInfoVOList));
+        return childInfoVOList;
     }
 
     @Override
     public Child searchChildById(String childId) {
         Child child = childMapper.selectById(childId);
-        if (child == null){
+        if (child == null) {
             throw new BusinessException(ResponseCodeEnum.CODE_602);
         }
         return child;
     }
 
     @Override
-    public void exportLive(String childId, HttpServletResponse response)throws Exception {
+    public void exportLive(String childId, HttpServletResponse response) throws Exception {
         PageInfo<DailyTime> pageInfo = searchLive(childId, 9999);
         List<DailyTime> dataList = pageInfo.getList();
 
@@ -265,9 +277,9 @@ public class ChildServiceImpl implements ChildService {
     }
 
     @Override
-    public void updateGrowthRecord(String childId,Integer height,Integer weight,Integer headCirc){
+    public void updateGrowthRecord(String childId, Integer height, Integer weight, Integer headCirc) {
         Child child = childMapper.selectById(childId);
-        if (child == null){
+        if (child == null) {
             throw new BusinessException("儿童信息不存在");
         }
         child.setHeight(height);
@@ -352,10 +364,99 @@ public class ChildServiceImpl implements ChildService {
         java.sql.Date start = java.sql.Date.valueOf(startDate);
         java.sql.Date end = java.sql.Date.valueOf(endDate);
         Child child = childMapper.selectById(childId);
-        if (child == null){
+        if (child == null) {
             throw new BusinessException("儿童信息不存在");
         }
         return growthTrendMapper.selectByChildIdAndDateRange(childId, start, end);
+    }
+
+    @Override
+    public void updateGrowthTrend(GrowthTrend growthTrend) {
+        if (growthTrend.getId() == null || growthTrend.getId().isBlank()) {
+            throw new BusinessException("数据id不能为空");
+        }
+        if (growthTrend.getChildId() == null || growthTrend.getChildId().isBlank()) {
+            throw new BusinessException("儿童ID不能为空");
+        }
+        GrowthTrend oldRecord = growthTrendMapper.selectById(growthTrend.getId());
+        if (oldRecord == null) {
+            throw new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        Child child = childMapper.selectById(growthTrend.getChildId());
+        if (child == null) {
+            throw new BusinessException("儿童信息不存在");
+        }
+        if (growthTrend.getHeight() != null) {
+            oldRecord.setHeight(growthTrend.getHeight());
+        }
+        if (growthTrend.getWeight() != null) {
+            oldRecord.setWeight(growthTrend.getWeight());
+        }
+        if (growthTrend.getHeadCirc() != null) {
+            oldRecord.setHeadCirc(growthTrend.getHeadCirc());
+        }
+        if (growthTrend.getChineseWordCount() != null) {
+            oldRecord.setChineseWordCount(growthTrend.getChineseWordCount());
+        }
+        if (growthTrend.getEnglishWordCount() != null) {
+            oldRecord.setEnglishWordCount(growthTrend.getEnglishWordCount());
+        }
+        if (growthTrend.getPoetryCount() != null) {
+            oldRecord.setPoetryCount(growthTrend.getPoetryCount());
+        }
+        growthTrendMapper.updateById(oldRecord);
+        if (oldRecord.getHeight() != null) {
+            child.setHeight(oldRecord.getHeight());
+        }
+        if (oldRecord.getWeight() != null) {
+            child.setWeight(oldRecord.getWeight());
+        }
+        if (oldRecord.getHeadCirc() != null) {
+            child.setHeadCirc(oldRecord.getHeadCirc());
+        }
+        child.setChineseWordCount(oldRecord.getChineseWordCount());
+        child.setEnglishWordCount(oldRecord.getEnglishWordCount());
+        child.setPoetryCount(oldRecord.getPoetryCount());
+        child.setRecordDate(new java.sql.Date(System.currentTimeMillis()));
+        childMapper.update(child);
+    }
+
+    @Override
+    public List<AvailableTimeVO> loadFreeTime(String examinationId) {
+        Examination examination = childMapper.selectExamById(examinationId);
+        if (examination == null) {
+            throw new BusinessException("体检信息不存在");
+        }
+        List<AppointExamination> appointments = childMapper.selectAppointExamination(examinationId);
+        List<Integer> timeStatus = new ArrayList<>();
+        Date startDate = examination.getStartTime();
+        Date endDate = examination.getEndTime();
+        int startHour = DateUtils.getHour(startDate);
+        int endHour = DateUtils.getHour(endDate);
+        int totalHour = DateUtils.getHourDiff(startDate, endDate);
+        for (int i = 0; i < totalHour; i++) {
+            timeStatus.add(1);
+        }
+        for (AppointExamination appointment : appointments){
+            int appointHour = DateUtils.getHour(appointment.getAppointTime());
+            int index = appointHour - startHour;
+            if (index >= 0 && index < timeStatus.size()){
+                timeStatus.set(index, 0);
+            }
+        }
+        List<Integer> availableHours = new ArrayList<>();
+        for (int i = 0; i < timeStatus.size(); i++) {
+            if (timeStatus.get(i) == 1) {
+                availableHours.add(startHour + i);
+            }
+        }
+        AvailableTimeVO vo = new AvailableTimeVO();
+        vo.setDoctorId(examination.getDoctorId());
+        vo.setDoctorName(examination.getDoctorName());
+        vo.setDate(new SimpleDateFormat("yyyy-MM-dd").format(examination.getStartTime()));
+        vo.setAvailableHours(availableHours);
+        return Collections.singletonList(vo);
+
     }
 
     @Override
@@ -365,13 +466,18 @@ public class ChildServiceImpl implements ChildService {
     }
 
     @Override
+    public List<ExaminationVO> findMyExamination(String familyId) {
+        return childMapper.findMyExamination(familyId);
+    }
+
+    @Override
     public void deleteGrowthRecord(String id) {
         growthTrendMapper.deleteById(id);
     }
 
     @Override
-    public void cancelExamination(String examinationId) {
-        childMapper.deleteExamination(examinationId);
+    public void cancelExamination(String appointId) {
+        childMapper.deleteExamination(appointId);
     }
 
     @Override
@@ -397,6 +503,7 @@ public class ChildServiceImpl implements ChildService {
         String[] split = vaccineEnum.name().split("_");
         return Integer.parseInt(split[1]);
     }
+
     private boolean isVaccineDone(VaccineRecord record, ChildVaccineEnum vaccineEnum) {
         String name = vaccineEnum.name();
         int needTimes = getNeedTimes(vaccineEnum);
@@ -432,9 +539,10 @@ public class ChildServiceImpl implements ChildService {
 
     /**
      * 根据疫苗类型更新对应字段
-     * @param record 接种记录
-     * @param vaccineType 疫苗类型（如乙肝、卡介苗）
-     * @param needleNum 针次
+     *
+     * @param record        接种记录
+     * @param vaccineType   疫苗类型（如乙肝、卡介苗）
+     * @param needleNum     针次
      * @param inoculateTime 接种时间
      */
     private void updateRecordByVaccineType(VaccineRecord record, String vaccineType, Integer needleNum, Date inoculateTime) {

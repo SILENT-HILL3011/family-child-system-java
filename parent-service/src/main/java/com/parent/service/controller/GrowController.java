@@ -1,9 +1,12 @@
 package com.parent.service.controller;
 
 import com.child.common.annotation.GlobalInterceptor;
+import com.child.common.constants.Constant;
 import com.child.common.entity.enums.DailyTimeEnum;
 import com.child.common.entity.po.*;
+import com.child.common.entity.vo.AvailableTimeVO;
 import com.child.common.entity.vo.ChildInfoVO;
+import com.child.common.entity.vo.ExaminationVO;
 import com.child.common.entity.vo.ResponseCodeEnum;
 import com.child.common.exception.BusinessException;
 import com.child.common.result.R;
@@ -38,8 +41,8 @@ public class GrowController {
 
     @RequestMapping("/searchChildInfo")
     @GlobalInterceptor(checkLogin = true)
-    public R<PageInfo<ChildInfoVO>> searchChildInfo(@NotEmpty String familyId, Integer pageNum){
-        return R.success(childService.searchChildInfo(familyId,pageNum));
+    public R<List<ChildInfoVO>> searchChildInfo(@NotEmpty String familyId){
+        return R.success(childService.searchChildInfo(familyId));
     }
 
     @RequestMapping("/searchChildById")
@@ -72,12 +75,18 @@ public class GrowController {
 
     @RequestMapping("/searchGrowth")
     @GlobalInterceptor(checkLogin = true)
-    public R<List<GrowthTrend>> searchGrowth(@NotEmpty String childId,Integer days){
-        List<GrowthTrend> growthTrends = childService.searchGrowth(childId, days);
+    public R<List<GrowthTrend>> searchGrowth(@NotEmpty String childId){
+        List<GrowthTrend> growthTrends = childService.searchGrowth(childId, Constant.DAYS_OF_WEEK);
         return R.success(growthTrends);
     }
 
-    @RequestMapping("/deleteGrowthRecord")
+    @RequestMapping("/updateGrowthTrend")
+    @GlobalInterceptor(checkLogin = true)
+    public R updateGrowthTrend(@RequestBody GrowthTrend growthTrend){
+        childService.updateGrowthTrend(growthTrend);
+        return R.success();
+    }
+    @RequestMapping("/deleteGrowthTrend")
     @GlobalInterceptor(checkLogin = true)
     public R deleteGrowthRecord(@NotEmpty String id){
         childService.deleteGrowthRecord(id);
@@ -106,11 +115,18 @@ public class GrowController {
         return R.success(notDoneVaccine);
     }
 
+
     @RequestMapping("/appointExamination")
     @GlobalInterceptor(checkLogin = true)
-    public R<Examination> appointExamination(@NotEmpty String childId,@NotEmpty String doctorId,@NotEmpty String startTime){
-        Examination examination = childService.appointExamination(childId,doctorId,startTime);
+    public R<Examination> appointExamination(@NotEmpty String childId,@NotEmpty String examinationId,@NotEmpty String startTime){
+        Examination examination = childService.appointExamination(childId,examinationId,startTime);
         return R.success(examination);
+    }
+
+    @RequestMapping("/loadFreeTime")
+    @GlobalInterceptor(checkLogin = true)
+    public R<List<AvailableTimeVO>> loadFreeTime(@NotEmpty String examinationId){
+        return R.success(childService.loadFreeTime(examinationId));
     }
 
     @RequestMapping("/searchExamination")
@@ -119,14 +135,18 @@ public class GrowController {
         return R.success(childService.loadExamination());
     }
 
-    @RequestMapping("/cancelExamination")
+    @RequestMapping("/findMyExamination")
     @GlobalInterceptor(checkLogin = true)
-    public R cancelExamination(@NotEmpty String examinationId){
-        childService.cancelExamination(examinationId);
-        return R.success();
+    public R<List<ExaminationVO>> findMyExamination(@NotEmpty String familyId){
+        return R.success(childService.findMyExamination(familyId));
     }
 
-
+    @RequestMapping("/cancelExamination")
+    @GlobalInterceptor(checkLogin = true)
+    public R cancelExamination(@NotEmpty String appointId){
+        childService.cancelExamination(appointId);
+        return R.success();
+    }
 
 
     @RequestMapping("/recordLive")
