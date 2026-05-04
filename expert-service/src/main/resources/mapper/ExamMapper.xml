@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.expert.service.mapper.ExamMapper">
+
+    <select id="selectMyExamination" resultType="com.child.common.entity.vo.ExaminationVO">
+        SELECT
+            a.appoint_id AS appointId,
+            e.examination_id AS examinationId,
+            c.child_name AS childName,
+            ei.expert_name AS doctorName,
+            e.start_time AS startTime,
+            e.end_time AS endDate,
+            CASE
+                WHEN NOW() &lt; e.start_time THEN 1
+                WHEN NOW() &gt;= e.start_time AND NOW() &lt;= e.end_time THEN 2
+                WHEN NOW() &gt; e.end_time AND NOW() &lt;= DATE_ADD(e.end_time, INTERVAL 7 DAY) THEN 3
+                ELSE NULL
+                END AS status
+        FROM
+            personal_examination_record e
+                LEFT JOIN expert_info ei ON e.doctor_id = ei.expert_id
+                INNER JOIN examination_appoint a ON e.examination_id = a.examination_id
+                LEFT JOIN child_info c ON a.child_id = c.child_id
+        WHERE
+            e.doctor_id = #{expertId}
+        ORDER BY
+            e.start_time DESC
+    </select>
+
+
+    <insert id="insertExamReport">
+        INSERT INTO physical_exam (
+            report_id,
+            appoint_id,
+            child_id,
+            height,
+            weight,
+            head_circ,
+            vision,
+            hearing,
+            tooth,
+            heart,
+            abdomen,
+            limb,
+            skin,
+            nerve,
+            suggestion,
+            exam_date,
+            doctor
+        ) VALUES (
+                     #{reportId},
+                     #{appointId},
+                     #{childId},
+                     #{height},
+                     #{weight},
+                     #{headCirc},
+                     #{vision},
+                     #{hearing},
+                     #{tooth},
+                     #{heart},
+                     #{abdomen},
+                     #{limb},
+                     #{skin},
+                     #{nerve},
+                     #{suggestion},
+                     #{examDate},
+                     #{doctor}
+                 )
+    </insert>
+
+
+</mapper>

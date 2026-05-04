@@ -1,17 +1,12 @@
 package com.parent.service.service.impl;
 
-import cn.hutool.core.date.DateUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.child.common.constants.Constant;
 import com.child.common.entity.enums.ChildVaccineEnum;
-import com.child.common.entity.enums.TimePerEnum;
 import com.child.common.entity.po.*;
-import com.child.common.entity.vo.AvailableTimeVO;
-import com.child.common.entity.vo.ChildInfoVO;
-import com.child.common.entity.vo.ExaminationVO;
-import com.child.common.entity.vo.ResponseCodeEnum;
+import com.child.common.entity.vo.*;
 import com.child.common.exception.BusinessException;
 import com.child.common.redis.RedisComponent;
 import com.child.common.utils.ChildVaccineUtil;
@@ -274,6 +269,36 @@ public class ChildServiceImpl implements ChildService {
         EasyExcel.write(response.getOutputStream(), DailyTimeExcel.class)
                 .sheet("生活记录")
                 .doWrite(excelList);
+    }
+
+    @Override
+    public void exportGrowth(String childId, HttpServletResponse response)throws Exception {
+        List<GrowthTrend> growthTrendList = childMapper.selectGrowth(childId);
+        List<GrowthTrendExcel> excelList = new ArrayList<>();
+        for (GrowthTrend g : growthTrendList) {
+            GrowthTrendExcel e = new GrowthTrendExcel();
+            e.setRecordDate(g.getRecordDate() == null ? "" : g.getRecordDate().toString());
+            e.setHeight(g.getHeight());
+            e.setWeight(g.getWeight());
+            e.setHeadCirc(g.getHeadCirc());
+            e.setChineseWordCount(g.getChineseWordCount());
+            e.setEnglishWordCount(g.getEnglishWordCount());
+            e.setPoetryCount(g.getPoetryCount());
+            excelList.add(e);
+        }
+        response.reset();
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("UTF-8");
+        String fileName = URLEncoder.encode("成长记录", "UTF-8");
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
+        EasyExcel.write(response.getOutputStream(), GrowthTrendExcel.class)
+                .sheet("成长记录")
+                .doWrite(excelList);
+    }
+
+    @Override
+    public PhysicalExamVO checkResult(String appointId) {
+        return childMapper.getExamReportByAppointId(appointId);
     }
 
     @Override

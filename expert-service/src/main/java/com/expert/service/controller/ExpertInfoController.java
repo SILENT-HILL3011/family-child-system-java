@@ -3,6 +3,8 @@ package com.expert.service.controller;
 import com.child.common.annotation.GlobalInterceptor;
 import com.child.common.constants.Constant;
 import com.child.common.entity.po.ExpertInfo;
+import com.child.common.entity.po.PhysicalExam;
+import com.child.common.entity.vo.ExaminationVO;
 import com.child.common.redis.RedisComponent;
 import com.child.common.result.R;
 import com.expert.service.service.ExpertService;
@@ -13,6 +15,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/expert/info")
@@ -60,6 +64,23 @@ public class ExpertInfoController {
         String token = request.getHeader(Constant.TOKEN_HEADER_KEY);
         String expertId = redisComponent.getExpertIdByToken(token);
         expertService.createPersonalExamination(expertId,startTime,endTime);
+        return R.success();
+    }
+
+    @RequestMapping("/getMyExamination")
+    @GlobalInterceptor(checkLogin = true)
+    public R<List<ExaminationVO>> getMyExamination(){
+        String token = request.getHeader(Constant.TOKEN_HEADER_KEY);
+        String expertId = redisComponent.getExpertIdByToken(token);
+        return R.success(expertService.getMyExamination(expertId));
+    }
+
+    @RequestMapping("/putExamResult")
+    @GlobalInterceptor(checkLogin = true)
+    public R putExamResult(@RequestBody PhysicalExam physicalExam){
+        String token = request.getHeader(Constant.TOKEN_HEADER_KEY);
+        String expertId = redisComponent.getExpertIdByToken(token);
+        expertService.putExamResult(expertId,physicalExam);
         return R.success();
     }
 }

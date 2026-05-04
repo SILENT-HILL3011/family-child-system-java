@@ -1,21 +1,23 @@
 package com.expert.service.service.impl;
 
 import com.child.common.constants.Constant;
-import com.child.common.entity.po.Examination;
-import com.child.common.entity.po.ExpertInfo;
-import com.child.common.entity.po.MainBox;
+import com.child.common.entity.po.*;
+import com.child.common.entity.vo.ExaminationVO;
 import com.child.common.entity.vo.ResponseCodeEnum;
 import com.child.common.exception.BusinessException;
 import com.child.common.redis.RedisComponent;
 import com.child.common.utils.DateUtils;
 import com.child.common.utils.StringTools;
+import com.expert.service.mapper.ExamMapper;
 import com.expert.service.mapper.ExpertInfoMapper;
 import com.expert.service.service.ExpertService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class ExpertServiceImpl implements ExpertService {
@@ -27,6 +29,8 @@ public class ExpertServiceImpl implements ExpertService {
     private RedisComponent redisComponent;
     @Resource
     private HttpServletRequest request;
+    @Resource
+    private ExamMapper examMapper;
 
     @Override
     public void register(String expertPhone, String expertPassword) {
@@ -99,5 +103,28 @@ public class ExpertServiceImpl implements ExpertService {
             throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
         return expertInfo;
+    }
+
+    @Override
+    public List<ExaminationVO> getMyExamination(String expertId) {
+        return examMapper.selectMyExamination(expertId);
+    }
+
+    @Override
+    public void putExamResult(String expertId, PhysicalExam physicalExam) {
+        AppointExamination appointExamination = examMapper.selectAppointExaminationById(physicalExam.getAppointId());
+        if (appointExamination == null){
+            throw new BusinessException("预约记录不存在");
+        }
+        PhysicalExam oldReport = examMapper.selectExamReportByReportId(physicalExam.getReportId());
+        if (oldReport != null) {
+            throw new BusinessException("该预约已提交体检报告，请勿重复提交");
+        }
+        physicalExam.setChildId(appointExamination.getChildId());
+        physicalExam.setDoctor(expertInfoMapper.getExpertNameById(expertId));
+        physicalExam.setReportId(StringTools.getRandomNumber(Constant.LENGTH_12));
+        physicalExam.setExamDate(appointExamination.getAppointTime());
+        examMapper.insertExamReport(physicalExam);
+
     }
 }

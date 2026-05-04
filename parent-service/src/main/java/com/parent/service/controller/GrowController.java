@@ -4,18 +4,18 @@ import com.child.common.annotation.GlobalInterceptor;
 import com.child.common.constants.Constant;
 import com.child.common.entity.enums.DailyTimeEnum;
 import com.child.common.entity.po.*;
-import com.child.common.entity.vo.AvailableTimeVO;
-import com.child.common.entity.vo.ChildInfoVO;
-import com.child.common.entity.vo.ExaminationVO;
-import com.child.common.entity.vo.ResponseCodeEnum;
+import com.child.common.entity.vo.*;
 import com.child.common.exception.BusinessException;
 import com.child.common.result.R;
+import com.child.common.utils.PDFUtil;
 import com.github.pagehelper.PageInfo;
 import com.parent.service.service.ChildService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +29,7 @@ import java.util.List;
 @Validated
 public class GrowController {
 
+    private static final Logger log = LoggerFactory.getLogger(GrowController.class);
     @Resource
     private ChildService childService;
 
@@ -148,6 +149,28 @@ public class GrowController {
         return R.success();
     }
 
+    @RequestMapping("/checkResult")
+    @GlobalInterceptor(checkLogin = true)
+    public R<PhysicalExamVO> checkResult(@NotEmpty String appointId){
+        PhysicalExamVO physicalExamVO = childService.checkResult(appointId);
+        return R.success(physicalExamVO);
+    }
+
+    @RequestMapping("/exportExamPdf")
+    public void exportExamPdf(@NotEmpty String appointId, HttpServletResponse  response){
+        try {
+            PhysicalExamVO vo = childService.checkResult(appointId);
+            if (vo == null) {
+                response.setContentType("text/html;charset=utf-8");
+                response.getWriter().write("报告不存在");
+                return;
+            }
+            PDFUtil.exportExamPdf(vo, response);
+        }catch (Exception e){
+            log.error("导出pdf失败",e);
+        }
+    }
+
 
     @RequestMapping("/recordLive")
     @GlobalInterceptor(checkLogin = true)
@@ -193,6 +216,11 @@ public class GrowController {
     @RequestMapping("/exportLive")
     public void exportLive(@NotEmpty String childId, HttpServletResponse  response)throws Exception{
         childService.exportLive(childId, response);
+    }
+
+    @RequestMapping("/exportGrowth")
+    public void exportGrowth(@NotEmpty String childId, HttpServletResponse  response)throws Exception{
+        childService.exportGrowth(childId, response);
     }
 
     @PostMapping("/updateGrowthRecord")

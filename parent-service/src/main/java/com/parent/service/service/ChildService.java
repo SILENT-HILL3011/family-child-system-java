@@ -4,6 +4,7 @@ import com.child.common.entity.po.*;
 import com.child.common.entity.vo.AvailableTimeVO;
 import com.child.common.entity.vo.ChildInfoVO;
 import com.child.common.entity.vo.ExaminationVO;
+import com.child.common.entity.vo.PhysicalExamVO;
 import com.github.pagehelper.PageInfo;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -61,4 +62,8 @@ public interface ChildService {
     List<ExaminationVO> findMyExamination(String familyId);
 
     List<AvailableTimeVO> loadFreeTime(String examinationId);
+
+    void exportGrowth(String childId, HttpServletResponse response) throws Exception;
+
+    PhysicalExamVO checkResult(String appointId);
 }

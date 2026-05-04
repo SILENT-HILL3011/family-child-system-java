@@ -1,11 +1,9 @@
 package com.parent.service.mapper;
 
-import com.child.common.entity.po.AppointExamination;
-import com.child.common.entity.po.Child;
-import com.child.common.entity.po.Examination;
-import com.child.common.entity.po.VaccineRecord;
+import com.child.common.entity.po.*;
 import com.child.common.entity.vo.ChildInfoVO;
 import com.child.common.entity.vo.ExaminationVO;
+import com.child.common.entity.vo.PhysicalExamVO;
 import org.apache.ibatis.annotations.*;
 
 import java.time.LocalDateTime;
@@ -87,4 +85,9 @@ public interface ChildMapper {
 
     @Select("select * from examination_appoint where examination_id = #{examinationId}")
     List<AppointExamination> selectAppointExamination(String examinationId);
+
+    @Select("select * from growth_trend where child_id = #{childId}")
+    List<GrowthTrend> selectGrowth(String childId);
+
+    PhysicalExamVO getExamReportByAppointId(@Param("appointId") String appointId);
 }

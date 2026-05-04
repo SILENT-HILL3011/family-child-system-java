@@ -25,4 +25,7 @@ public interface ExpertInfoMapper {
 
     @Insert("insert into sys_message (id,send_user_id,title,content,create_time,is_read) values (#{id},#{sendUserId},#{title},#{content},#{createTime},#{isRead})")
     void insertMailOfExamination(MainBox mainBox);
+
+    @Select("select expert_name from expert_info where expert_id = #{expertId}")
+    String getExpertNameById(String expertId);
 }

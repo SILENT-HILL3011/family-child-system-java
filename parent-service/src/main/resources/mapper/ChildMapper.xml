@@ -126,5 +126,33 @@
             e.start_time DESC
     </select>
 
+    <select id="getExamReportByAppointId" resultType="com.child.common.entity.vo.PhysicalExamVO">
+        SELECT
+            p.report_id     AS reportId,
+            p.appoint_id    AS appointId,
+            p.child_id      AS childId,
+            c.child_name    AS childName,
+            p.height        AS height,
+            p.weight        AS weight,
+            p.head_circ     AS headCirc,
+            p.vision        AS vision,
+            p.hearing       AS hearing,
+            p.tooth         AS tooth,
+            p.heart         AS heart,
+            p.abdomen       AS abdomen,
+            p.limb          AS limb,
+            p.skin          AS skin,
+            p.nerve         AS nerve,
+            p.suggestion    AS suggestion,
+            p.exam_date     AS examDate,
+            p.doctor        AS doctor
+        FROM
+            physical_exam p
+                LEFT JOIN
+            child_info c ON p.child_id = c.child_id
+        WHERE
+            p.appoint_id = #{appointId}
+    </select>
+
 
 </mapper>
