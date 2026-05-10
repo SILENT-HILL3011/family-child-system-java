@@ -3,6 +3,7 @@ package com.parent.service.service.impl;
 import com.child.common.constants.Constant;
 import com.child.common.entity.po.*;
 import com.child.common.entity.vo.MessageBoardVO;
+import com.child.common.entity.vo.TaskVO;
 import com.child.common.exception.BusinessException;
 import com.child.common.utils.DateUtils;
 import com.child.common.utils.StringTools;
@@ -90,7 +91,26 @@ public class FamilyServiceImpl implements FamilyService {
                 .collect(Collectors.toList());
     }
 
-
+    @Override
+    public List<TaskVO> searchAllTask(String familyId) {
+        List<TaskInfo> taskList = taskMapper.selectFamilyTodayTasks(familyId);
+        List<TaskVO> voList = new ArrayList<>();
+        for (TaskInfo info : taskList) {
+            TaskVO vo = new TaskVO();
+            vo.setTaskId(info.getTaskId());
+            vo.setPublisherId(info.getPublisherId());
+            vo.setReceiverId(info.getReceiverId() == null ? "未接受" : info.getReceiverId());
+            vo.setTaskName(info.getTaskName());
+            vo.setIsAccepted(info.getIsAccepted());
+            vo.setIsFinished(info.getIsFinished());
+            vo.setPublishDate(info.getPublishDate());
+            vo.setMemberName(info.getMemberName());
+            vo.setAcceptStatus(info.getIsAccepted() == 1 ? "已接受" : "待接受");
+            vo.setFinishStatus(info.getIsFinished() == 1 ? "已完成" : "未完成");
+            voList.add(vo);
+        }
+        return voList;
+    }
 
     @Override
     public void publishMessage(String publisherId, String content, String imageUrl) {

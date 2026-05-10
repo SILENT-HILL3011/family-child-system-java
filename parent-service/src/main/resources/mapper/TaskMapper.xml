@@ -27,4 +27,33 @@
             #{taskId}
         </foreach>
     </update>
+
+    <resultMap id="TaskInfoMap" type="com.child.common.entity.po.TaskInfo">
+        <id column="task_id" property="taskId"/>
+        <result column="publisher_id" property="publisherId"/>
+        <result column="receiver_id" property="receiverId"/>
+        <result column="task_name" property="taskName"/>
+        <result column="is_accepted" property="isAccepted"/>
+        <result column="is_finished" property="isFinished"/>
+        <result column="publish_date" property="publishDate"/>
+        <result column="member_name" property="memberName"/>
+    </resultMap>
+
+    <select id="selectFamilyTodayTasks" resultMap="TaskInfoMap">
+        SELECT
+            t.task_id,
+            t.publisher_id,
+            t.receiver_id,
+            t.task_name,
+            t.is_accepted,
+            t.is_finished,
+            t.publish_date,
+            m.member_name
+        FROM task_info t
+                 INNER JOIN member_info m
+                            ON t.receiver_id = m.member_id
+        WHERE m.family_id = #{familyId}
+          AND DATE(t.publish_date) = CURDATE() -- 只查今天的任务
+        ORDER BY t.publish_date DESC
+    </select>
 </mapper>

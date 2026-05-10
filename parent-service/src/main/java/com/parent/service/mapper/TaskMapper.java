@@ -29,5 +29,6 @@ public interface TaskMapper {
     @Select("select * from task_info where receiver_id = #{userId} and is_finished = 0 and is_accepted = 1")
     List<TaskInfo> selectByReceiverId(String userId);
 
-    List<TaskInfo> searchTaskOfAllMember(String familyId);
+
+    List<TaskInfo> selectFamilyTodayTasks(String familyId);
 }

@@ -3,6 +3,7 @@ package com.parent.service.service;
 import com.child.common.entity.po.MessageComment;
 import com.child.common.entity.po.TaskInfo;
 import com.child.common.entity.vo.MessageBoardVO;
+import com.child.common.entity.vo.TaskVO;
 import com.github.pagehelper.PageInfo;
 
 import java.util.List;
@@ -33,4 +34,5 @@ public interface FamilyService {
 
     void changeRole(String phoneNumber, Integer role);
 
+    List<TaskVO> searchAllTask(String familyId);
 }

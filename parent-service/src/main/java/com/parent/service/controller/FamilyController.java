@@ -6,6 +6,7 @@ import com.child.common.constants.Constant;
 import com.child.common.entity.po.MessageComment;
 import com.child.common.entity.po.TaskInfo;
 import com.child.common.entity.vo.MessageBoardVO;
+import com.child.common.entity.vo.TaskVO;
 import com.child.common.redis.RedisComponent;
 import com.child.common.result.R;
 import com.parent.service.service.FamilyService;
@@ -55,6 +56,13 @@ public class FamilyController {
     @GlobalInterceptor(checkLogin = true)
     public R<List<TaskInfo>> searchTask(@NotEmpty String familyId){
         List<TaskInfo> taskInfos = familyService.searchTask(familyId);
+        return R.success(taskInfos);
+    }
+
+    @RequestMapping("/searchAllTask")
+    @GlobalInterceptor(checkLogin = true)
+    public R<List<TaskVO>> searchAllTask(@NotEmpty String familyId){
+        List<TaskVO> taskInfos = familyService.searchAllTask(familyId);
         return R.success(taskInfos);
     }
 

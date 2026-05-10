@@ -8,6 +8,7 @@ import com.child.common.entity.po.ExpertInfo;
 import com.child.common.entity.po.MessageBoardExpert;
 import com.child.common.entity.po.UtilInfo;
 import com.child.common.entity.vo.MessageInfoVO;
+import com.child.common.entity.vo.ToolVO;
 import com.child.common.redis.RedisComponent;
 import com.child.common.result.R;
 import com.github.pagehelper.PageInfo;
@@ -23,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -93,6 +95,43 @@ public class UtilController {
     public R finishMessage(@NotEmpty String boardId){
         utilService.finishMessage(boardId);
         return R.success("结束咨询成功");
+    }
+
+    @RequestMapping("/recommend")
+    @GlobalInterceptor(checkLogin = true)
+    public R<List<ToolVO>> recommendTools(){
+        List<ToolVO> list = Arrays.asList(
+
+                new ToolVO(
+                        "儿童健康问诊",
+                        "全平台",
+                        "症状自查、疾病判断、药品推荐",
+                        "内置知识图谱，智能匹配",
+                        "免费"
+                ),
+                new ToolVO(
+                        "过敏原查询",
+                        "全平台",
+                        "食物过敏风险快速查询",
+                        "Neo4j知识图谱，实时关联",
+                        "免费"
+                ),
+                new ToolVO(
+                        "营养素查询",
+                        "全平台",
+                        "食物营养成分展示",
+                        "搭配饮食推荐使用",
+                        "免费"
+                ),
+                new ToolVO(
+                        "育儿知识库",
+                        "全平台",
+                        "按年龄、学科获取育儿知识",
+                        "内容权威，适合0-6岁儿童",
+                        "免费"
+                )
+        );
+        return R.success(list);
     }
 
 }
