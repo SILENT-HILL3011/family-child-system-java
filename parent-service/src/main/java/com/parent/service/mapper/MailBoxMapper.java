@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Update;
 import java.util.List;
 
 public interface MailBoxMapper {
-    @Insert("insert into main_box(id, send_user_id, title, user_id, content,is_read) values(#{id}, #{sendUserId}, #{title}, #{userId}, #{content},#{isRead})")
+    @Insert("insert into sys_message(id, send_user_id, title, user_id, content,is_read) values(#{id}, #{sendUserId}, #{title}, #{userId}, #{content},#{isRead})")
     void insert(MainBox mainBox);
 
     @Select({

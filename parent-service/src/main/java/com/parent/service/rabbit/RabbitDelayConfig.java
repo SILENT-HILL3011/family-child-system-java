@@ -1,12 +1,10 @@
 package com.parent.service.rabbit;
 
-import com.child.common.constants.Constant;
 import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.HashMap;
-import java.util.Map;
+
 
 @Configuration
 public class RabbitDelayConfig {
@@ -35,7 +33,7 @@ public class RabbitDelayConfig {
 
     @Bean
     public Binding dlxBinding() {
-        return BindingBuilder.bind(dlxQueue()).to(dlxExchange()).with("dlx.key");
+        return BindingBuilder.bind(dlxQueue()).to(dlxExchange()).with("schedule.key");
     }
 
     @Bean

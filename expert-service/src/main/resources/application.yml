@@ -9,19 +9,34 @@ spring:
   application:
     name: expert-service
   datasource:
-    url: jdbc:mysql://192.168.150.101:3306/parent_service
+    url: jdbc:mysql://localhost:3306/parent_service
     username: root
-    password: 301123gsw
+    password: 123456123456
     driver-class-name: com.mysql.jdbc.Driver
   data:
     redis:
       database: 0
-      host: 192.168.150.101
+      host: localhost
       port: 6379
   cloud:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+  mail:
+    host: smtp.163.com
+    username: 13843842030@163.com
+    password: FWeewtAFefkxskU7
+    default-encoding: UTF-8
+    port: 465
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+          starttls:
+            enable: true
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml

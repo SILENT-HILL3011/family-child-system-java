@@ -19,6 +19,8 @@ import java.util.UUID;
 public class FileController {
 
     private static final String SAVE_PATH = "E:/webser/web_app/family-client/avatar/";
+
+    private static final String MESSAGE_PATH = "E:/webser/web_app/family-client/message/";
     @RequestMapping("/upload/avatar")
     @GlobalInterceptor(checkLogin = true)
     public R<String> uploadAvatar(MultipartFile file) throws IOException {
@@ -46,6 +48,26 @@ public class FileController {
         File file = new File(SAVE_PATH + Constant.THUMBNAIL_PREFIX + filename);
         return Files.readAllBytes(file.toPath());
     }
+
+    @RequestMapping("/upload/message")
+//    @GlobalInterceptor(checkLogin = true)
+    public R<String> uploadMessage(MultipartFile file) throws IOException{
+        File dir = new File(MESSAGE_PATH);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        String fileName = UUID.randomUUID() + getFileExtension(file.getOriginalFilename());
+        File dest = new File(MESSAGE_PATH + fileName);
+        file.transferTo(dest);
+        return R.success("/child/file/message/" + fileName);
+    }
+
+    @RequestMapping("/message/{fileName:.+}")
+    public byte[] getMessageImage(@PathVariable String fileName) throws IOException {
+        File file = new File(MESSAGE_PATH + fileName);
+        return Files.readAllBytes(file.toPath());
+    }
+
 
     private String getFileExtension(String originalFileName) {
         if (originalFileName == null || !originalFileName.contains(".")) {

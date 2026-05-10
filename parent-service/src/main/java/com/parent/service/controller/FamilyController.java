@@ -15,6 +15,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -57,6 +58,7 @@ public class FamilyController {
         return R.success(taskInfos);
     }
 
+
     @RequestMapping("/finishTask")
     @GlobalInterceptor(checkLogin = true)
     public R<TaskInfo> finishTask(@NotEmpty String taskName){
@@ -78,7 +80,8 @@ public class FamilyController {
 
     @RequestMapping("/publishMessage")
     @GlobalInterceptor(checkLogin = true)
-    public R publishMessage(String content,String imageUrl){
+    public R publishMessage(@RequestParam(value = "content", required = false) String content,
+                            @RequestParam(value = "imageUrl", required = false) String imageUrl){
         String token = request.getHeader(Constant.TOKEN_HEADER_KEY);
         String publisherId = redisComponent.getUserIdByToken(token);
         familyService.publishMessage(publisherId,content,imageUrl);

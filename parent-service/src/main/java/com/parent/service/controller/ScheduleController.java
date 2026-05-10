@@ -37,6 +37,20 @@ public class ScheduleController {
         return R.success();
     }
 
+    @RequestMapping("/deleteSchedule")
+    @GlobalInterceptor(checkLogin = true)
+    public R deleteSchedule(@NotEmpty String scheduleId){
+        scheduleService.deleteSchedule(scheduleId);
+        return R.success();
+    }
+
+    @RequestMapping("/editSchedule")
+    @GlobalInterceptor(checkLogin = true)
+    public R editSchedule(@NotEmpty String scheduleId,@NotEmpty String work){
+        scheduleService.editSchedule(scheduleId,work);
+        return R.success();
+    }
+
     @RequestMapping("/getScheduleByMonth")
     @GlobalInterceptor(checkLogin = true)
     public R<List<ScheduleInfo>> getScheduleByMonth(@NotEmpty String month){

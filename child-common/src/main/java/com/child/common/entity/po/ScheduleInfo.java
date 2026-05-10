@@ -5,11 +5,20 @@ import java.util.Date;
 
 public class ScheduleInfo implements Serializable {
 
+    private String scheduleId;
     private String userId;
     private Date date;
     private Integer importance;
     private Integer form;
     private String work;
+
+    public String getScheduleId() {
+        return scheduleId;
+    }
+
+    public void setScheduleId(String scheduleId) {
+        this.scheduleId = scheduleId;
+    }
 
     public String getWork() {
         return work;

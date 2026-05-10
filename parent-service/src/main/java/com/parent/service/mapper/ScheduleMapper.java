@@ -10,7 +10,7 @@ import java.util.List;
 public interface ScheduleMapper {
 
 
-    @Insert("insert into schedule_info(user_id,form,importance,date,work) values(#{userId},#{form},#{importance},#{date},#{work})")
+    @Insert("insert into schedule_info(schedule_id,user_id,form,importance,date,work) values(#{scheduleId},#{userId},#{form},#{importance},#{date},#{work})")
     void insertScheduleInfo(ScheduleInfo scheduleInfo);
 
     @Select("select * from schedule_info where date=#{curDate} and user_id=#{userId}")
@@ -26,4 +26,13 @@ public interface ScheduleMapper {
 
     @Select("select * from schedule_info where importance=1 and date=date(#{tomorrow})")
     List<ScheduleInfo> selectTomorrowImportantSchedule(Date tomorrow);
+
+    @Select("delete from schedule_info where schedule_id = #{scheduleId}")
+    void deleteSchedule(String scheduleId);
+
+    @Select("select * from schedule_info where schedule_id = #{scheduleId}")
+    ScheduleInfo selectScheduleInfoByScheduleId(String scheduleId);
+
+    @Select("update schedule_info set work=#{work} where schedule_id=#{scheduleId}")
+    void updateScheduleInfo(ScheduleInfo scheduleInfo);
 }

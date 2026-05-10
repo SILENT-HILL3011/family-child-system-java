@@ -32,4 +32,5 @@ public interface FamilyService {
 
 
     void changeRole(String phoneNumber, Integer role);
+
 }

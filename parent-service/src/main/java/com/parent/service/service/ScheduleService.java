@@ -8,4 +8,8 @@ public interface ScheduleService {
     void createSchedule(String userId, String scheduleForm, String importance, String date,String work);
 
     List<ScheduleInfo> getScheduleByMonth(String userId, String month);
+
+    void deleteSchedule(String scheduleId);
+
+    void editSchedule(String scheduleId, String work);
 }

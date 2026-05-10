@@ -90,6 +90,8 @@ public class FamilyServiceImpl implements FamilyService {
                 .collect(Collectors.toList());
     }
 
+
+
     @Override
     public void publishMessage(String publisherId, String content, String imageUrl) {
         Member member = userMapper.selectFamilyByMemberId(publisherId);
@@ -130,6 +132,7 @@ public class FamilyServiceImpl implements FamilyService {
             messageBoardVO.setLikeCount(messageBoard.getLikeCount());
             messageBoardVO.setCommentCount(messageBoard.getCommentCount());
             messageBoardVO.setAvatar(messageBoard.getAvatar());
+            messageBoardVO.setImageUrl(messageBoard.getImageUrl());
             messageBoardVOList.add(messageBoardVO);
         }
         return messageBoardVOList;

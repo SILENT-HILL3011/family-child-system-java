@@ -7,10 +7,19 @@ public class MessageBoardVO {
     private String messageId;
     private String memberName;
     private String content;
+    private String imageUrl;
     private Date publishTime;
     private Integer likeCount;
     private Integer commentCount;
     private String avatar;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
     public String getAvatar() {
         return avatar;

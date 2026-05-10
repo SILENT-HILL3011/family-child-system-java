@@ -11,6 +11,15 @@ public class TaskInfo {
     private Integer isAccepted;
     private Integer isFinished;
     private Date publishDate;
+    private String memberName;
+
+    public String getMemberName() {
+        return memberName;
+    }
+
+    public void setMemberName(String memberName) {
+        this.memberName = memberName;
+    }
 
     public Date getPublishDate() {
         return publishDate;
